@@ -64,15 +64,15 @@ public class MainActivity extends AppCompatActivity {
                 {
                     lista.add(teste);
                 }
+                //achaPalavra(tamanho + 1, teste);
+            }
+            for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
+            {
+                char letra = alfabeto.get(i);
+                String teste = palavra + letra;
+
                 achaPalavra(tamanho + 1, teste);
             }
-            //for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
-           // {
-           //     char letra = alfabeto.get(i);
-           //     String teste = palavra + letra;
-
-            //achaPalavra(tamanho + 1, teste);
-           // }
 
         }
     }
@@ -86,18 +86,15 @@ public class MainActivity extends AppCompatActivity {
 
     boolean testaPalavra(String palavra)
     {
-
         Matcher matcher = regex.matcher(palavra);
         if (matcher.matches())
             return true;
-        else
-            return false;
+        return false;
 
     }
 
     private Pattern gerarRegex()
     {
-
             try {
                 String expressao = etExpressao.getText().toString();
                 expressao = expressao.replaceAll(" ", "");
@@ -144,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
                     aux.set(i, letraB);
                     aux.set(j, letraA);
                 }
-
             }
         }
         return aux;
@@ -160,7 +156,10 @@ public class MainActivity extends AppCompatActivity {
             Matcher matcher = regex.matcher(entrada);
             //tvConjunto.setText(alfabeto.toString());
             //tvConjunto.setVisibility(View.VISIBLE);
-            achaPalavra(1, "");
+            if(etExpressao.getText().toString().length() > 0)
+                achaPalavra(1, "");
+            else
+                lista.add("ε");
             listaOrdenada = ordenarLista(lista);
             mostrarPalavrasNoTextView(listaOrdenada);
             if (matcher.matches())
