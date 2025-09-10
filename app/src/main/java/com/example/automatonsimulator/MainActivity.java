@@ -16,7 +16,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,29 +54,50 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void achaPalavra(int tamanho, String palavra)
+    private void achaPalavra()
     {
-        if(lista.size() < 10  && tamanho <= 10)
+        List<String> fila = new ArrayList<>();
+
+        if(testaPalavra("")){
+            lista.add("ε");
+        }
+        fila.add("");
+        while(!fila.isEmpty() && lista.size() < 10 && fila.get(0).length() <= 10)
         {
-            for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
+            String palavra = fila.remove(0);
+            for(int i=0; i<alfabeto.size() && lista.size() < 10; i++)
             {
                 char letra = alfabeto.get(i);
-                String teste = palavra + letra;
+                String novaPalavra = palavra + letra;
 
-                if(testaPalavra(teste))//pegar oque o antonucci fez
+                fila.add(novaPalavra);
+                if(testaPalavra(novaPalavra))//pegar oque o antonucci fez
                 {
-                    lista.add(teste);
+                    lista.add(novaPalavra);
                 }
-                //achaPalavra(tamanho + 1, teste);
-            }
-            for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
-            {
-                char letra = alfabeto.get(i);
-                String teste = palavra + letra;
-
-                achaPalavra(tamanho + 1, teste);
             }
         }
+//        if(lista.size() < 10  && tamanho <= 10)
+//        {
+//            for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
+//            {
+//                char letra = alfabeto.get(i);
+//                String teste = palavra + letra;
+//
+//                if(testaPalavra(teste))//pegar oque o antonucci fez
+//                {
+//                    lista.add(teste);
+//                }
+//                //achaPalavra(tamanho + 1, teste);
+//            }
+//            for(int i=0; i<alfabeto.size() && lista.size()<10; i++)
+//            {
+//                char letra = alfabeto.get(i);
+//                String teste = palavra + letra;
+//
+//                achaPalavra(tamanho + 1, teste);
+//            }
+//        }
     }
 
     private void mostrarPalavrasNoTextView(List<String> lista)
@@ -155,9 +178,7 @@ public class MainActivity extends AppCompatActivity {
             //tvConjunto.setText(alfabeto.toString());
             //tvConjunto.setVisibility(View.VISIBLE);
             if(etExpressao.getText().toString().length() > 0){
-                if(testaPalavra(""))
-                    lista.add("ε");
-                achaPalavra(1, "");
+                achaPalavra();
             }
             else
                 lista.add("ε");
