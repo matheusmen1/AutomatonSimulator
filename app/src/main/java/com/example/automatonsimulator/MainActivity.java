@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     List<Character> alfabeto = new ArrayList<>();
     List<String> lista = new ArrayList<>(), listaOrdenada = new ArrayList<>();
     String expressao, entrada;
+    boolean flag = false;
     EditText etExpressao, etEntrada;
     Button btTestar;
     TextView tvConjunto;
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
                 achaPalavra(tamanho + 1, teste);
             }
-
         }
     }
 
@@ -87,10 +87,7 @@ public class MainActivity extends AppCompatActivity {
     boolean testaPalavra(String palavra)
     {
         Matcher matcher = regex.matcher(palavra);
-        if (matcher.matches())
-            return true;
-        return false;
-
+        return matcher.matches(); //o matches me retorna se deu certo ou n
     }
 
     private Pattern gerarRegex()
@@ -103,10 +100,11 @@ public class MainActivity extends AppCompatActivity {
                 expressao = expressao.replaceAll("ε", "");
                 int i = 0;
                 char letra;
+                //aqui eu coleto o meu alfabeto
                 while(i < expressao.length())
                 {
                     letra = expressao.charAt(i);
-                    if (letra != '+' && letra != '|' && letra != '(' && letra != ')' && letra != '[' && letra != ']' && letra != ',')
+                    if (letra != '|' && letra != '(' && letra != ')' && letra != '[' && letra != ']' && letra != ',')
                     {
                         if(!alfabeto.contains(letra))
                         {
@@ -116,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     i++;
                 }
 
-                return Pattern.compile("^" + expressao + "$");
+                return Pattern.compile(expressao);
             }
             catch (Exception e)
             {
@@ -150,18 +148,21 @@ public class MainActivity extends AppCompatActivity {
         listaOrdenada.clear();
         lista.clear();
         entrada = etEntrada.getText().toString();
-        regex = gerarRegex();
+        regex = gerarRegex(); //retorna um pattern
         if (regex != null)
         {
             Matcher matcher = regex.matcher(entrada);
             //tvConjunto.setText(alfabeto.toString());
             //tvConjunto.setVisibility(View.VISIBLE);
-            if(etExpressao.getText().toString().length() > 0)
+            if(etExpressao.getText().toString().length() > 0){
+                if(testaPalavra(""))
+                    lista.add("ε");
                 achaPalavra(1, "");
+            }
             else
                 lista.add("ε");
-            listaOrdenada = ordenarLista(lista);
-            mostrarPalavrasNoTextView(listaOrdenada);
+            //listaOrdenada = ordenarLista(lista);
+            mostrarPalavrasNoTextView(lista);
             if (matcher.matches())
             {
                 Toast.makeText(this, "Entrada ACEITA", Toast.LENGTH_SHORT).show();
