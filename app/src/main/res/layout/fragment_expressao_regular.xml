@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2f2c79"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="18dp"
+    tools:context=".ExpressaoRegularFragment">
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="400dp"
+        android:layout_height="78dp"
+        android:layout_marginBottom="60dp"
+        android:fontFamily="casual"
+        android:gravity="center"
+        android:shadowColor="#F0F0F0"
+        android:shadowDx="4"
+        android:shadowDy="2"
+        android:shadowRadius="2"
+        android:text="Automaton Simulator"
+        android:textColor="#9f90ea"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="38dp"
+        android:fontFamily="casual"
+        android:text="Expressão Regular"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etExpressao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="38dp"
+        android:backgroundTint="#F0F0F0"
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*+|().ε"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:inputType="text"
+        android:text="(a|b).(a|b).(a|b)"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="38dp"
+        android:fontFamily="casual"
+        android:text="Entrada"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etEntrada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:backgroundTint="#F0F0F0"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:inputType="text"
+        android:text="aab"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvConjunto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:fontFamily="casual"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/btTestar"
+        android:layout_width="248dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#9f90ea"
+        android:fontFamily="casual"
+        android:text="Testar"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+</LinearLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/it_expressao"
+        android:title="Expressão Regular" />
+    <item
+        android:id="@+id/it_automato"
+        android:title="Autômato Finito" />
+    <item
+        android:id="@+id/it_gramatica"
+        android:title="Gramática Regular" />
+    <item
+        android:id="@+id/it_sair"
+        android:title="Sair" />
+</menu>
