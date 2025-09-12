@@ -1,5 +1,6 @@
 package com.example.automatonsimulator;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -54,12 +55,14 @@ public class MainActivity extends AppCompatActivity {
         {
             if(item.getItemId()==R.id.it_expressao)
             {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(frameLayout.getId(), expressaoRegularFragment);
                 fragmentTransaction.commit();
             }
             if(item.getItemId()==R.id.it_automato)
             {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(frameLayout.getId(), automatoFinitoFragment);
                 fragmentTransaction.commit();

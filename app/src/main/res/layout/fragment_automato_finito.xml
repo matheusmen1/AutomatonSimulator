@@ -1,14 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AutomatoFinitoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.example.automatonsimulator.AutomatonView
+        android:id="@+id/automatoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:backgroundTint="@color/black" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/btMove"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#2f2c79"
+        android:fontFamily="casual"
+        android:text="MOVE"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btNew"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="150dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#2f2c79"
+        android:fontFamily="casual"
+        android:text="NEW"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btEdit"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="270dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#2f2c79"
+        android:fontFamily="casual"
+        android:text="EDIT"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btDel"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="390dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#2f2c79"
+        android:fontFamily="casual"
+        android:text="DEL"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp" />
+</FrameLayout>
