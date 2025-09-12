@@ -12,6 +12,11 @@
         android:layout_height="match_parent"
         android:backgroundTint="@color/black" />
 
+    <com.example.automatonsimulator.TransicaoView
+        android:id="@+id/transicaoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <Button
         android:id="@+id/btMove"
         android:layout_width="110dp"
@@ -63,4 +68,18 @@
         android:text="DEL"
         android:textColor="#F0F0F0"
         android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btLig"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="510dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#2f2c79"
+        android:fontFamily="casual"
+        android:text="LIG"
+        android:textColor="#F0F0F0"
+        android:textSize="18sp" />
+
 </FrameLayout>

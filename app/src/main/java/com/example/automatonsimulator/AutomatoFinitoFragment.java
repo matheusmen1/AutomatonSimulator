@@ -2,19 +2,10 @@ package com.example.automatonsimulator;
 
 import android.annotation.SuppressLint;
 
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 
 import android.view.MenuItem;
@@ -37,13 +28,16 @@ import java.util.List;
  */
 public class AutomatoFinitoFragment extends Fragment {
     private float X, Y, offSetX = 0, offSetY =0 ;
-    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0;
-    private Button btNew, btMove, btEdit, btDel;
+    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
+    private Button btNew, btMove, btEdit, btDel, btLig;
     AutomatonView automatonView;
+    TransicaoView transicaoView;
     List<Estado> estadoList = new ArrayList<>();
+    List<Transicao> transicaoList = new ArrayList<>();
     LinkedList<Integer> excluidoList = new LinkedList<>();
     MenuItem it_final, it_inicial;
     public int cont = 0, index = -1;
+    private Estado EstadoIniLig, EstadoFimLig;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -97,11 +91,9 @@ public class AutomatoFinitoFragment extends Fragment {
         btDel = view.findViewById(R.id.btDel);
         btEdit = view.findViewById(R.id.btEdit);
         btMove = view.findViewById(R.id.btMove);
+        btLig = view.findViewById(R.id.btLig);
         automatonView = view.findViewById(R.id.automatoView);
-
-        //btn new começa ativado
-        updateButtonElevation(btNew);
-
+        transicaoView = view.findViewById(R.id.transicaoView);
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,10 +102,9 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagDel = 0;
                 flagEdit = 0;
                 flagMove = 0;
-                updateButtonElevation(btNew);
+                flagLig = 0;
             }
         });
-
         btMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,10 +113,9 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagDel = 0;
                 flagEdit = 0;
                 flagMove = 1;
-                updateButtonElevation(btMove);
+                flagLig = 0;
             }
         });
-
         btDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,10 +124,9 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagDel = 1;
                 flagEdit = 0;
                 flagMove = 0;
-                updateButtonElevation(btDel);
+                flagLig = 0;
             }
         });
-
         btEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,10 +135,20 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagDel = 0;
                 flagEdit = 1;
                 flagMove = 0;
-                updateButtonElevation(btEdit);
+                flagLig = 0;
             }
         });
-
+        btLig.setOnClickListener( new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(view.getContext(), "Modo Ligação ATIVADO ", Toast.LENGTH_SHORT).show();
+                flagNew = 0;
+                flagDel = 0;
+                flagEdit = 0;
+                flagMove = 0;
+                flagLig = 1;
+            }
+        });
         automatonView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -293,13 +292,22 @@ public class AutomatoFinitoFragment extends Fragment {
                         Estado estado;
                         while(i < estadoList.size() && flag != 1)
                         {
-
                             estado = estadoList.get(i);
                             auxX = X - estado.getX();
                             auxY = Y - estado.getY();
                             distancia = (float) Math.sqrt(Math.pow(auxX, 2) + Math.pow(auxY, 2));
                             if (distancia <= 70)
                             {
+                                for(int j=0; j< transicaoList.size(); j++) //remover todas as transições com esse automato
+                                {
+                                    if(transicaoList.get(j).getDestino() == estado || transicaoList.get(j).getOrigem() == estado)
+                                    {
+                                        Transicao transicao = transicaoList.get(j);
+                                        transicaoList.remove(transicao);
+                                        transicaoView.remover(transicao);
+                                        j--;
+                                    }
+                                }
                                 estadoList.remove(estado);
                                 automatonView.remover(estado);
                                 flag = 1;
@@ -332,6 +340,63 @@ public class AutomatoFinitoFragment extends Fragment {
                             i++;
                         }
                     }
+                    else if(flagLig == 1)
+                    {
+                        Estado estado = null;
+                        float auxX, auxY, distancia;
+                        int i = 0;
+                        int flag = 0;
+                        while(i < estadoList.size() && flag != 1)
+                        {
+                            estado = estadoList.get(i);
+                            auxX = X - estado.getX();
+                            auxY = Y - estado.getY();
+                            distancia = (float) Math.sqrt(Math.pow(auxX, 2) + Math.pow(auxY, 2));
+                            if (distancia <= 70)
+                            {
+                                flag = 1;
+                            }
+                            i++;
+                        }
+                        if(flag == 0)
+                            estado = null;
+
+                        //já busquei o automato que cliquei
+                        if(flagLigIni == 0) //estou pegando o primeiro
+                        {
+                            flagLigIni = 1;
+
+                            if(estado == null) //nao peguei nada
+                            {
+                                flagLigIni = 0;
+                            }
+                            else //peguei alguma
+                            {
+                                EstadoIniLig = estado;
+                            }
+                        }
+                        else //estou pegando o segundo
+                        {
+                            flagLigIni = 0;
+
+                            if(estado == null)
+                            {
+                                EstadoIniLig = null;
+                                EstadoFimLig = null;
+                            }
+                            else
+                            {
+                                //fazer a ligação entre os estados EstadoIniLig e EstadoFimLig
+
+                                //aparecer o campo para colocar os characteres
+
+                                EstadoFimLig = estado;
+                                Transicao transicao = new Transicao(EstadoIniLig, EstadoFimLig, null);
+                                transicaoList.add(transicao);
+                                transicaoView.addLista(transicao);
+                            }
+                        }
+                    }
 
                 }
                 else
@@ -343,6 +408,7 @@ public class AutomatoFinitoFragment extends Fragment {
                         estado.setX(event.getX() - offSetX);
                         estado.setY(event.getY() - offSetY);
                         automatonView.atualizarEstado(estado, index);
+                        transicaoView.atualizarLig();
                     }
 
                 }
@@ -372,55 +438,4 @@ public class AutomatoFinitoFragment extends Fragment {
         }
 
     }
-
-    private void updateButtonElevation(Button activeButton) {
-        Button[] allButtons = {btNew, btMove, btEdit, btDel};
-
-        float activeElevation = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                15, // botão ativo mais alto
-                getResources().getDisplayMetrics()
-        );
-
-        float inactiveElevation = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                10,// botão inativo mais baixo
-                getResources().getDisplayMetrics()
-        );
-
-        int activeColor = Color.parseColor("#FF9800");  // cor do botão ativo (ex: laranja)
-        int inactiveColor = Color.parseColor("#2f2c79"); // cor padrão dos botões
-
-        for (Button button : allButtons) {
-            if (button == activeButton) {
-                // Anima elevação e escala
-                button.animate()
-                        .translationZ(activeElevation)
-                        .scaleX(1.1f)
-                        .scaleY(1.1f)
-                        .setDuration(200)
-                        .start();
-
-                // Muda cor do botão ativo
-                if (button instanceof com.google.android.material.button.MaterialButton) {
-                    ((com.google.android.material.button.MaterialButton) button)
-                            .setBackgroundTintList(ColorStateList.valueOf(activeColor));
-                }
-            } else {
-                button.animate()
-                        .translationZ(inactiveElevation)
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .start();
-
-                // Volta para cor normal
-                if (button instanceof com.google.android.material.button.MaterialButton) {
-                    ((com.google.android.material.button.MaterialButton) button)
-                            .setBackgroundTintList(ColorStateList.valueOf(inactiveColor));
-                }
-            }
-        }
-    }
-
 }
