@@ -156,8 +156,17 @@ public class AutomatoFinitoFragment extends Fragment {
                         }
                         else
                         {
-                            estado = new Estado(X, Y, "q"+cont, 0, 1);
-                            cont++;
+                            if (excluidoList.isEmpty())
+                            {
+                                estado = new Estado(X, Y, "q"+cont, 0, 1);
+                                cont++;
+                            }
+                            else
+                            {
+                                int aux = excluidoList.getFirst();
+                                estado = new Estado(X, Y, "q"+aux, 0, 1);
+                                excluidoList.removeFirst();
+                            }
                         }
 
                         estadoList.add(estado);
@@ -274,7 +283,7 @@ public class AutomatoFinitoFragment extends Fragment {
                                 automatonView.remover(estado);
                                 flag = 1;
                                 excluidoList.addFirst(Integer.parseInt(estado.getNum().substring(1)));
-
+                                ordenarLista();
                             }
                             i++;
                         }
@@ -325,5 +334,21 @@ public class AutomatoFinitoFragment extends Fragment {
         });
         return view;
     }
+    public void ordenarLista()
+    {
+        int aux;
+        for (int i = 0; i < excluidoList.size(); i++)
+        {
+            for (int j = i + 1; j < excluidoList.size(); j++)
+            {
+                if (excluidoList.get(i) > excluidoList.get(j))
+                {
+                   aux = excluidoList.get(i);
+                   excluidoList.set(i, excluidoList.get(j));
+                   excluidoList.set(j, aux);
+                }
+            }
+        }
 
+    }
 }
