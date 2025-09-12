@@ -2,10 +2,13 @@ package com.example.automatonsimulator;
 
 import android.annotation.SuppressLint;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 
 import android.view.MenuItem;
@@ -94,6 +97,10 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig = view.findViewById(R.id.btLig);
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
+
+        //animação para bt new começa ativado
+        updateButtonElevation(btNew);
+
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,6 +110,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btNew);
             }
         });
         btMove.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +122,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 1;
                 flagLig = 0;
+                updateButtonElevation(btMove);
             }
         });
         btDel.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +134,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btDel);
             }
         });
         btEdit.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +146,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 1;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btEdit);
             }
         });
         btLig.setOnClickListener( new View.OnClickListener(){
@@ -147,6 +158,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 1;
+                updateButtonElevation(btLig);
             }
         });
         automatonView.setOnTouchListener(new View.OnTouchListener() {
@@ -437,5 +449,55 @@ public class AutomatoFinitoFragment extends Fragment {
             }
         }
 
+    }
+
+    private void updateButtonElevation(Button activeButton) {
+        Button[] allButtons = {btNew, btMove, btEdit, btDel, btLig};
+
+        float activeElevation = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                15, // botão ativo mais alto
+                getResources().getDisplayMetrics()
+        );
+
+        float inactiveElevation = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                10,// botão inativo mais baixo
+                getResources().getDisplayMetrics()
+        );
+
+        int activeColor = Color.parseColor("#FF9800");  // cor do botão ativo (ex: laranja)
+        int inactiveColor = Color.parseColor("#2f2c79"); // cor padrão dos botões
+
+        for (Button button : allButtons) {
+            if (button == activeButton) {
+                // Anima elevação e escala
+                button.animate()
+                        .translationZ(activeElevation)
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(200)
+                        .start();
+
+                // Muda cor do botão ativo
+                if (button instanceof com.google.android.material.button.MaterialButton) {
+                    ((com.google.android.material.button.MaterialButton) button)
+                            .setBackgroundTintList(ColorStateList.valueOf(activeColor));
+                }
+            } else {
+                button.animate()
+                        .translationZ(inactiveElevation)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(200)
+                        .start();
+
+                // Volta para cor normal
+                if (button instanceof com.google.android.material.button.MaterialButton) {
+                    ((com.google.android.material.button.MaterialButton) button)
+                            .setBackgroundTintList(ColorStateList.valueOf(inactiveColor));
+                }
+            }
+        }
     }
 }
