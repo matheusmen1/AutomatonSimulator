@@ -99,6 +99,10 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig = view.findViewById(R.id.btLig);
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
+
+        //animação para bt new começa ativado
+        updateButtonElevation(btNew);
+
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,6 +112,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btNew);
             }
         });
         btMove.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +124,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 1;
                 flagLig = 0;
+                updateButtonElevation(btMove);
             }
         });
         btDel.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +136,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btDel);
             }
         });
         btEdit.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +148,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 1;
                 flagMove = 0;
                 flagLig = 0;
+                updateButtonElevation(btEdit);
             }
         });
         btLig.setOnClickListener( new View.OnClickListener(){
@@ -152,6 +160,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 1;
+                updateButtonElevation(btLig);
             }
         });
         automatonView.setOnTouchListener(new View.OnTouchListener() {
