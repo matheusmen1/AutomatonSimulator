@@ -106,7 +106,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Modo Adição ATIVADO", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Modo Adição ATIVADO", Toast.LENGTH_SHORT).show();
                 flagNew = 1;
                 flagDel = 0;
                 flagEdit = 0;
@@ -118,7 +118,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Modo Mover ATIVADO", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Modo Mover ATIVADO", Toast.LENGTH_SHORT).show();
                 flagNew = 0;
                 flagDel = 0;
                 flagEdit = 0;
@@ -130,7 +130,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Modo Deletar ATIVADO ", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Modo Deletar ATIVADO ", Toast.LENGTH_SHORT).show();
                 flagNew = 0;
                 flagDel = 1;
                 flagEdit = 0;
@@ -142,7 +142,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Modo Edição ATIVADO ", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Modo Edição ATIVADO ", Toast.LENGTH_SHORT).show();
                 flagNew = 0;
                 flagDel = 0;
                 flagEdit = 1;
@@ -154,7 +154,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Modo Ligação ATIVADO ", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Modo Ligação ATIVADO ", Toast.LENGTH_SHORT).show();
                 flagNew = 0;
                 flagDel = 0;
                 flagEdit = 0;
@@ -411,9 +411,9 @@ public class AutomatoFinitoFragment extends Fragment {
                                 EditText input = new EditText(v.getContext());
 
                                 new AlertDialog.Builder(v.getContext())
-                                        .setTitle("Digite algo")
+                                        .setTitle("Enter Input")
                                         .setView(input)
-                                        .setPositiveButton("OK", (dialog, which) -> {
+                                        .setPositiveButton("Ok", (dialog, which) -> {
                                             int flagExiste = 0;
                                             Transicao transicao = procuraTransicao(estadoSelecionado);
                                             if (transicao == null) //transição ainda não existia
@@ -457,9 +457,9 @@ public class AutomatoFinitoFragment extends Fragment {
                                             else
                                                 transicaoView.atualizarLig();
 
-                                            Toast.makeText(v.getContext(), "Digitou: " + coletado, Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(v.getContext(), "Digitou: " + coletado, Toast.LENGTH_SHORT).show();
                                         })
-                                        .setNegativeButton("Cancelar", null)
+                                        .setNegativeButton("Cancel", null)
                                         .show();
                             }
                         }
@@ -543,7 +543,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 getResources().getDisplayMetrics()
         );
 
-        int activeColor = Color.parseColor("#FF9800");  // cor do botão ativo (ex: laranja)
+        int activeColor = Color.parseColor("#9f90ea");  // cor do botão ativo (ex: laranja)
         int inactiveColor = Color.parseColor("#2f2c79"); // cor padrão dos botões
 
         for (Button button : allButtons) {
