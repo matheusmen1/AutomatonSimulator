@@ -26,9 +26,11 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
+        android:stateListAnimator="@null"
         android:text="MOVE"
         android:textColor="#F0F0F0"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
 
     <Button
         android:id="@+id/btNew"
@@ -39,9 +41,11 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
+        android:stateListAnimator="@null"
         android:text="NEW"
         android:textColor="#F0F0F0"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
 
     <Button
         android:id="@+id/btEdit"
@@ -52,9 +56,11 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
+        android:stateListAnimator="@null"
         android:text="EDIT"
         android:textColor="#F0F0F0"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
 
     <Button
         android:id="@+id/btDel"
@@ -65,9 +71,11 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
+        android:stateListAnimator="@null"
         android:text="DEL"
         android:textColor="#F0F0F0"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
 
     <Button
         android:id="@+id/btLig"
@@ -78,8 +86,30 @@
         android:layout_marginBottom="10dp"
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
+        android:stateListAnimator="@null"
         android:text="LIG"
         android:textColor="#F0F0F0"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="125dp"
+        android:layout_height="25dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="69dp"
+        app:cardBackgroundColor="#F0F0F0"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp">
+
+        <TextView
+            android:id="@+id/tvEntrada"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:textColor="#9f90ea"
+            android:textSize="20sp" />
+
+    </androidx.cardview.widget.CardView>
 
 </FrameLayout>

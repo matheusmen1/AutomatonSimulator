@@ -2,6 +2,8 @@ package com.example.automatonsimulator;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
@@ -9,11 +11,13 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
     private FrameLayout frameLayout;
+    private Toolbar toolbar;
     private ExpressaoRegularFragment expressaoRegularFragment = new ExpressaoRegularFragment();
     private AutomatoFinitoFragment automatoFinitoFragment = new AutomatoFinitoFragment();
 
@@ -45,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout=findViewById(R.id.drawerLayout);
         navigationView=findViewById(R.id.navigationView);
         frameLayout = findViewById(R.id.frameLayout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open_menu,R.string.close_menu);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open_menu,R.string.close_menu);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -75,12 +82,31 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+
+    }
+    public interface OnNewEnterClickListener{
+        void onNewEnterClick();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_direita, menu);
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(actionBarDrawerToggle.onOptionsItemSelected(item))
             return true;
+        if (item.getItemId() == R.id.it_newEnter)
+        {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+            if (currentFragment instanceof OnNewEnterClickListener) {
+                ((OnNewEnterClickListener) currentFragment).onNewEnterClick();
+            }
+
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

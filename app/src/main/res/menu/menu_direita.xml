@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/it_newEnter"
+        android:title="New Enter" />
+    <item
+        android:id="@+id/it_step"
+        android:title="Step by Step" />
+    <item
+        android:id="@+id/it_quickRun"
+        android:title="Quick Run" />
+    <item
+        android:id="@+id/it_multipleRun"
+        android:title="Multiple Run" />
+</menu>

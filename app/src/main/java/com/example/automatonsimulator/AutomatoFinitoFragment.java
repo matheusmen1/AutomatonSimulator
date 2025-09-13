@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import java.util.List;
  * Use the {@link AutomatoFinitoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AutomatoFinitoFragment extends Fragment {
+public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnNewEnterClickListener {
     private float X, Y, offSetX = 0, offSetY =0 ;
     private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
     private Button btNew, btMove, btEdit, btDel, btLig;
@@ -42,6 +43,8 @@ public class AutomatoFinitoFragment extends Fragment {
     LinkedList<Integer> excluidoList = new LinkedList<>();
     MenuItem it_final, it_inicial;
     public int cont = 0, index = -1;
+    private String entrada;
+    private TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -85,6 +88,13 @@ public class AutomatoFinitoFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onNewEnterClick()
+    {
+        novaEntrada();
+        //Toast.makeText(getActivity(), "entrei", Toast.LENGTH_SHORT).show();
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,7 +109,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig = view.findViewById(R.id.btLig);
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
-
+        tvEntrada = view.findViewById(R.id.tvEntrada);
         //animação para bt new começa ativado
         updateButtonElevation(btNew);
 
@@ -528,6 +538,18 @@ public class AutomatoFinitoFragment extends Fragment {
         return null;
     }
 
+    private void novaEntrada()
+    {
+        EditText input = new EditText(getContext());
+        new AlertDialog.Builder(getContext())
+        .setTitle("Enter Input")
+        .setView(input)
+        .setPositiveButton("Ok", (dialog, which) -> {
+            tvEntrada.setText(input.getText().toString());
+        })
+        .setNegativeButton("Cancel", null)
+        .show();
+    }
     private void updateButtonElevation(Button activeButton) {
         Button[] allButtons = {btNew, btMove, btEdit, btDel, btLig};
 
