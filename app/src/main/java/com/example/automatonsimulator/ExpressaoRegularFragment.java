@@ -93,6 +93,7 @@ public class ExpressaoRegularFragment extends Fragment {
     private void achaPalavra()
     {
         List<String> fila = new ArrayList<>();
+        alfabeto.sort(null);
 
         if(testaPalavra("")){
             lista.add("ε");

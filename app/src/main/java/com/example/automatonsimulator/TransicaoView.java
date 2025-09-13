@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathMeasure;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -15,6 +16,8 @@ import java.util.List;
 
 public class TransicaoView extends View {
     private List<Transicao> transicoes = new ArrayList<>();
+    private List<Integer> opostos;
+    private static final float RAIO_ESTADO = 70f;
 
     public TransicaoView(Context context) {
         super(context);
@@ -27,11 +30,12 @@ public class TransicaoView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        opostos = new ArrayList<>(); // reset no começo
 
         Paint paint = new Paint();
         paint.setColor(Color.parseColor("#2f2c79"));
-        //paint.setStyle(Paint.Style.FILL);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(6);
+        paint.setStyle(Paint.Style.STROKE);
 
         Paint paintTriangulo = new Paint();
         paintTriangulo.setColor(Color.parseColor("#2f2c79"));
@@ -43,69 +47,164 @@ public class TransicaoView extends View {
         textPaint.setTextAlign(Paint.Align.CENTER);
 
         int i = 0;
-        while (i < transicoes.size())
-        {
+        while (i < transicoes.size()) {
             Transicao transicao = transicoes.get(i);
-            float raio = 70f;
 
-            // Posições centrais dos estados
-            float xOrigem = transicao.getOrigem().getX();
-            float yOrigem = transicao.getOrigem().getY();
-            float xDestino = transicao.getDestino().getX();
-            float yDestino = transicao.getDestino().getY();
+            // se já desenhei o oposto antes, pulo
+            if (opostos.contains(i)) {
+                i++;
+                continue;
+            }
 
-            // Vetor entre origem e destino
-            float dx = xDestino - xOrigem;
-            float dy = yDestino - yOrigem;
+            int oposto = buscaOposto(i);
 
-            // Distância entre os centros
-            float dist = (float) Math.sqrt(dx*dx + dy*dy);
+            if (oposto > -1) {
+                opostos.add(oposto);
 
-            // Normalização
-            float ux = dx / dist;
-            float uy = dy / dist;
+                // a->b (arco para cima)
+                desenharCurva(canvas, transicao, paint, paintTriangulo, textPaint, true);
 
-            // Ajuste para pegar exatamente na borda do círculo
-            float x1 = xOrigem + ux * raio;
-            float y1 = yOrigem + uy * raio;
-            float x2 = xDestino - ux * raio;
-            float y2 = yDestino - uy * raio;
-
-            //desenhar a linha
-            canvas.drawLine(x1, y1, x2, y2, paint);
-            //desenhar o triangulo para simular a seta
-            float arrowSize = 30f; // tamanho da seta
-
-            // direção normalizada já temos: ux, uy
-            // perpendicular (rotaciona 90 graus)
-            float perpX = -uy;
-            float perpY = ux;
-
-            // pontos do triângulo
-            float tipX = x2;
-            float tipY = y2;
-
-            float baseX1 = x2 - ux * arrowSize + perpX * (arrowSize / 2);
-            float baseY1 = y2 - uy * arrowSize + perpY * (arrowSize / 2);
-
-            float baseX2 = x2 - ux * arrowSize - perpX * (arrowSize / 2);
-            float baseY2 = y2 - uy * arrowSize - perpY * (arrowSize / 2);
-
-            // desenha o triângulo
-            Path path = new Path();
-            path.moveTo(tipX, tipY);
-            path.lineTo(baseX1, baseY1);
-            path.lineTo(baseX2, baseY2);
-            path.close();
-
-            canvas.drawPath(path, paint);
-
-            //desenhar o texto para as opções de transição que possuo
-            canvas.drawText(transicao.stringCharacteres(),(x1+x2)/2, (y1+y2)/2, textPaint);
+                // b->a (arco para baixo)
+                desenharCurva(canvas, transicoes.get(oposto), paint, paintTriangulo, textPaint, false);
+            } else {
+                // apenas reta normal
+                desenharLinhaReta(canvas, transicao, paint, paintTriangulo, textPaint);
+            }
 
             i++;
         }
+    }
 
+    /**
+     * Desenha uma linha reta de A → B
+     */
+    private void desenharLinhaReta(Canvas canvas, Transicao t, Paint paint, Paint paintTriangulo, Paint textPaint) {
+        float startX = t.getOrigem().getX();
+        float startY = t.getOrigem().getY();
+        float endX = t.getDestino().getX();
+        float endY = t.getDestino().getY();
+
+        // vetor direção
+        double angle = Math.atan2(endY - startY, endX - startX);
+
+        // recua o fim da linha para tangenciar o círculo destino
+        startX += RAIO_ESTADO * Math.cos(angle);
+        startY += RAIO_ESTADO * Math.sin(angle);
+        endX -= RAIO_ESTADO * Math.cos(angle);
+        endY -= RAIO_ESTADO * Math.sin(angle);
+
+        // linha
+        canvas.drawLine(startX, startY, endX, endY, paint);
+
+        // seta
+        desenharSeta(canvas, startX, startY, endX, endY, paintTriangulo);
+
+        // rótulo no meio
+        float midX = (startX + endX) / 2;
+        float midY = (startY + endY) / 2 - 10;
+        canvas.drawText(t.stringCharacteres(), midX, midY, textPaint);
+    }
+
+    /**
+     * Desenha uma curva (arco fino) para representar ida e volta
+     */
+    private void desenharCurva(Canvas canvas, Transicao t, Paint paint, Paint paintTriangulo, Paint textPaint, boolean cima) {
+        float startX = t.getOrigem().getX();
+        float startY = t.getOrigem().getY();
+        float endX = t.getDestino().getX();
+        float endY = t.getDestino().getY();
+
+        Path path = new Path();
+        path.moveTo(startX, startY);
+
+        // ponto de controle (quanto mais afastado, mais curva)
+        float midX = (startX + endX) / 2;
+        float midY = (startY + endY) / 2;
+        float offset = 100; // controla a "altura" do arco
+
+        if (cima) {
+            path.quadTo(midX, midY - offset, endX, endY);
+        } else {
+            path.quadTo(midX, midY + offset, endX, endY);
+        }
+
+        // medir o caminho
+        PathMeasure pm = new PathMeasure(path, false);
+        float length = pm.getLength();
+
+        // reduzir início e fim para tangenciar os círculos
+        float[] pos = new float[2];
+        Path recuado = new Path();
+        pm.getSegment(RAIO_ESTADO, length - RAIO_ESTADO, recuado, true);
+
+        // desenhar curva encurtada
+        canvas.drawPath(recuado, paint);
+
+        // seta tangente ao final
+        desenharSetaCurva(canvas, recuado, paintTriangulo);
+
+        // rótulo próximo ao meio da curva
+        if (cima) {
+            canvas.drawText(t.stringCharacteres(), midX, midY - offset - 10, textPaint);
+        } else {
+            canvas.drawText(t.stringCharacteres(), midX, midY + offset + 40, textPaint);
+        }
+    }
+
+    /**
+     * Desenha seta em linha reta
+     */
+    private void desenharSeta(Canvas canvas, float startX, float startY, float endX, float endY, Paint paint) {
+        double angle = Math.atan2(endY - startY, endX - startX);
+
+        float arrowLength = 30;
+        float arrowAngle = (float) Math.toRadians(25);
+
+        float x1 = (float) (endX - arrowLength * Math.cos(angle - arrowAngle));
+        float y1 = (float) (endY - arrowLength * Math.sin(angle - arrowAngle));
+
+        float x2 = (float) (endX - arrowLength * Math.cos(angle + arrowAngle));
+        float y2 = (float) (endY - arrowLength * Math.sin(angle + arrowAngle));
+
+        Path path = new Path();
+        path.moveTo(endX, endY);
+        path.lineTo(x1, y1);
+        path.lineTo(x2, y2);
+        path.close();
+
+        canvas.drawPath(path, paint);
+    }
+
+    /**
+     * Desenha seta no final de uma curva
+     */
+    private void desenharSetaCurva(Canvas canvas, Path path, Paint paint) {
+        PathMeasure pm = new PathMeasure(path, false);
+        float length = pm.getLength();
+
+        // pega ponto final e tangente
+        float[] pos = new float[2];
+        float[] tan = new float[2];
+        pm.getPosTan(length, pos, tan);
+
+        double angle = Math.atan2(tan[1], tan[0]);
+
+        float arrowLength = 30;
+        float arrowAngle = (float) Math.toRadians(25);
+
+        float x1 = (float) (pos[0] - arrowLength * Math.cos(angle - arrowAngle));
+        float y1 = (float) (pos[1] - arrowLength * Math.sin(angle - arrowAngle));
+
+        float x2 = (float) (pos[0] - arrowLength * Math.cos(angle + arrowAngle));
+        float y2 = (float) (pos[1] - arrowLength * Math.sin(angle + arrowAngle));
+
+        Path seta = new Path();
+        seta.moveTo(pos[0], pos[1]);
+        seta.lineTo(x1, y1);
+        seta.lineTo(x2, y2);
+        seta.close();
+
+        canvas.drawPath(seta, paint);
     }
 
     public void addLista(Transicao transicao){
@@ -123,5 +222,16 @@ public class TransicaoView extends View {
         invalidate();
     }
 
-
+    private int buscaOposto(int i) {
+        Transicao t = transicoes.get(i);
+        for (int j = 0; j < transicoes.size(); j++) {
+            if (i != j){
+                Transicao cand = transicoes.get(j);
+                if (cand.getOrigem().equals(t.getDestino()) && cand.getDestino().equals(t.getOrigem())) {
+                    return j;
+                }
+            }
+        }
+        return -1;
+    }
 }
