@@ -42,6 +42,7 @@ public class Transicao {
 
     public void setCharacteres(List<Character> characteres) {
         this.characteres = characteres;
+        ordenarChars();
     }
 
     public void addChar(Character character) {
@@ -54,5 +55,19 @@ public class Transicao {
 
         if(i<characteres.size())
             characteres.remove(i);
+    }
+
+    public void ordenarChars(){
+        characteres.sort(null);
+    }
+
+    public String stringCharacteres(){
+        String retorno = "";
+        retorno = retorno + characteres.get(0);
+        for(int i=1; i<characteres.size(); i++)
+        {
+            retorno = retorno + ',' + characteres.get(i);
+        }
+        return retorno;
     }
 }

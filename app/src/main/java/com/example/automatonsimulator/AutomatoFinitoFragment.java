@@ -2,6 +2,7 @@ package com.example.automatonsimulator;
 
 import android.annotation.SuppressLint;
 
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -97,10 +99,6 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig = view.findViewById(R.id.btLig);
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
-
-        //animação para bt new começa ativado
-        updateButtonElevation(btNew);
-
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +108,6 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
-                updateButtonElevation(btNew);
             }
         });
         btMove.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +119,6 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 1;
                 flagLig = 0;
-                updateButtonElevation(btMove);
             }
         });
         btDel.setOnClickListener(new View.OnClickListener() {
@@ -134,7 +130,6 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 0;
-                updateButtonElevation(btDel);
             }
         });
         btEdit.setOnClickListener(new View.OnClickListener() {
@@ -146,7 +141,6 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 1;
                 flagMove = 0;
                 flagLig = 0;
-                updateButtonElevation(btEdit);
             }
         });
         btLig.setOnClickListener( new View.OnClickListener(){
@@ -158,7 +152,6 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagEdit = 0;
                 flagMove = 0;
                 flagLig = 1;
-                updateButtonElevation(btLig);
             }
         });
         automatonView.setOnTouchListener(new View.OnTouchListener() {
@@ -382,14 +375,17 @@ public class AutomatoFinitoFragment extends Fragment {
                             {
                                 flagLigIni = 0;
                             }
-                            else //peguei alguma
+                            else //peguei alguma coisa
                             {
+                                //setar o botão para outra cor
                                 EstadoIniLig = estado;
                             }
                         }
                         else //estou pegando o segundo
                         {
                             flagLigIni = 0;
+
+                            //deixar o outro estado inicial com uma cor normal
 
                             if(estado == null)
                             {
@@ -398,14 +394,64 @@ public class AutomatoFinitoFragment extends Fragment {
                             }
                             else
                             {
-                                //fazer a ligação entre os estados EstadoIniLig e EstadoFimLig
+                                // cria cópias finais para capturar no lambda
+                                final Estado estadoSelecionado = estado;
+                                //final Transicao transicao = new Transicao();
 
                                 //aparecer o campo para colocar os characteres
+                                EditText input = new EditText(v.getContext());
 
-                                EstadoFimLig = estado;
-                                Transicao transicao = new Transicao(EstadoIniLig, EstadoFimLig, null);
-                                transicaoList.add(transicao);
-                                transicaoView.addLista(transicao);
+                                new AlertDialog.Builder(v.getContext())
+                                        .setTitle("Digite algo")
+                                        .setView(input)
+                                        .setPositiveButton("OK", (dialog, which) -> {
+                                            int flagExiste = 0;
+                                            Transicao transicao = procuraTransicao(estadoSelecionado);
+                                            if (transicao == null) //transição ainda não existia
+                                            {
+                                                transicao = new Transicao();
+                                            }
+                                            else //transição já existia
+                                                flagExiste = 1;
+
+                                            //PEGAR UMA STRING COM O ALFABETO DIGITADO
+                                            String coletado = input.getText().toString();
+                                            // aqui você já tem a string
+                                            //DESSA STRING, PEGAR CADA CARACTER E MANDAR PARA A LISTA DE CHARACTERES DA TRANSIÇÃO
+                                            List<Character> lista = characteresObtidos(coletado); //obter todos os caracteres diferentes da minha string
+                                            if(lista.isEmpty())
+                                                lista.add('ε');
+                                            List<Character> listaTransicao = transicao.getCharacteres();
+                                            if(listaTransicao == null)
+                                                transicao.setCharacteres(lista);
+                                            else
+                                            {
+                                                //adiciono os characteres qua ainda não existem
+                                                //se já existir essa aresta, apenas adicionar mais elementos na lista de characteres
+                                                for(int iterator=0; iterator<lista.size(); iterator++)
+                                                {
+                                                    if(!listaTransicao.contains(lista.get(iterator)))
+                                                        listaTransicao.add(lista.get(iterator));
+                                                }
+                                                transicao.setCharacteres(listaTransicao); //devolvo a lista atualizada
+                                            }
+
+                                            //fazer a ligação entre os estados EstadoIniLig e EstadoFimLig
+                                            EstadoFimLig = estadoSelecionado;
+                                            if(flagExiste == 0) //a transição não existia
+                                            {
+                                                transicao.setOrigem(EstadoIniLig); //= new Transicao(EstadoIniLig, EstadoFimLig, null);
+                                                transicao.setDestino(EstadoFimLig);
+                                                transicaoList.add(transicao);
+                                                transicaoView.addLista(transicao);
+                                            }
+                                            else
+                                                transicaoView.atualizarLig();
+
+                                            Toast.makeText(v.getContext(), "Digitou: " + coletado, Toast.LENGTH_SHORT).show();
+                                        })
+                                        .setNegativeButton("Cancelar", null)
+                                        .show();
                             }
                         }
                     }
@@ -449,6 +495,28 @@ public class AutomatoFinitoFragment extends Fragment {
             }
         }
 
+    }
+    public List<Character> characteresObtidos(String stringLida){
+        Character character;
+        List<Character> lista = new ArrayList<>();
+
+        for (int i=0; i<stringLida.length(); i++)
+        {
+            character = stringLida.charAt(i);
+            if(!lista.contains(character)){
+                lista.add(character);
+            }
+        }
+        return lista;
+    }
+
+    public Transicao procuraTransicao(Estado estado)
+    {
+        int i;
+        for(i=0; i<transicaoList.size() && (EstadoIniLig != transicaoList.get(i).getOrigem() || transicaoList.get(i).getDestino() != estado); i++);
+        if(i < transicaoList.size())
+            return transicaoList.get(i);
+        return null;
     }
 
     private void updateButtonElevation(Button activeButton) {
