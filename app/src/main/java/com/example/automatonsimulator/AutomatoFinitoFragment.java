@@ -7,11 +7,14 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +35,7 @@ import java.util.List;
  * Use the {@link AutomatoFinitoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnNewEnterClickListener {
+public class AutomatoFinitoFragment extends Fragment {
     private float X, Y, offSetX = 0, offSetY =0 ;
     private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
     private Button btNew, btMove, btEdit, btDel, btLig;
@@ -43,7 +46,6 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
     LinkedList<Integer> excluidoList = new LinkedList<>();
     MenuItem it_final, it_inicial;
     public int cont = 0, index = -1;
-    private String entrada;
     private TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
 
@@ -82,6 +84,7 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true); // diz ao sistema que esse fragmento tem menu
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -89,18 +92,40 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
     }
 
     @Override
-    public void onNewEnterClick()
-    {
-        novaEntrada();
-        //Toast.makeText(getActivity(), "entrei", Toast.LENGTH_SHORT).show();
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_direita, menu); // inflando o menu aqui
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.it_newEnter)
+        {
+            novaEntrada();
+            Toast.makeText(getActivity(), "new enter", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getItemId() == R.id.it_step)
+        {
+            Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getItemId() == R.id.it_quickRun)
+        {
+            if(testaRapidoPalavraAFD())
+                Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getActivity(), "Palavra REJEITADA!!", Toast.LENGTH_SHORT).show();
+        }
+        else if(item.getItemId() == R.id.it_multipleRun)
+        {
+            Toast.makeText(getActivity(), "multiple run", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         View view = inflater.inflate(R.layout.fragment_automato_finito, container, false);
         btNew = view.findViewById(R.id.btNew);
         btDel = view.findViewById(R.id.btDel);
@@ -110,9 +135,11 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
         tvEntrada = view.findViewById(R.id.tvEntrada);
+
         //animação para bt new começa ativado
         updateButtonElevation(btNew);
 
+        //os botões clicados, cada um com sua função
         btNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,6 +200,8 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
                 updateButtonElevation(btLig);
             }
         });
+
+        //a cada clique na tela, verificar o botão ativo e a sua respectiva ação
         automatonView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -498,6 +527,7 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
         });
         return view;
     }
+
     public void ordenarLista()
     {
         int aux;
@@ -515,6 +545,7 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
         }
 
     }
+
     public List<Character> characteresObtidos(String stringLida){
         Character character;
         List<Character> lista = new ArrayList<>();
@@ -550,6 +581,7 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
         .setNegativeButton("Cancel", null)
         .show();
     }
+
     private void updateButtonElevation(Button activeButton) {
         Button[] allButtons = {btNew, btMove, btEdit, btDel, btLig};
 
@@ -565,7 +597,7 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
                 getResources().getDisplayMetrics()
         );
 
-        int activeColor = Color.parseColor("#9f90ea");  // cor do botão ativo (ex: laranja)
+        int activeColor = Color.parseColor("#9f90ea");  // cor do botão ativo -> roxo mais claro
         int inactiveColor = Color.parseColor("#2f2c79"); // cor padrão dos botões
 
         for (Button button : allButtons) {
@@ -598,5 +630,101 @@ public class AutomatoFinitoFragment extends Fragment implements MainActivity.OnN
                 }
             }
         }
+    }
+
+    // FUNÇÕES PARA TESTAR AUTOMATOS RAPIDAMENTE (QUICK RUN)
+    //testa apenas AUTOMATOS FINITOS DETERMINÍSTICOS
+    private boolean testaRapidoPalavraAFD()
+    {
+        int i;
+        String entrada = tvEntrada.getText().toString();
+        Estado atual = getEstadoInicial();
+
+        if(atual == null)
+        {
+            /**
+             * Se verdade então não é possível o teste, pois não foi especificado
+             *  o estado inicial
+             * Exibir de alguma forma isso para o usuário
+             * */
+
+            //exibir que não foi possível realizar o teste porque não existe INICIAL
+            return false;
+        }
+        else if(!existeEstadoFinal())
+        {
+            /**
+             * Quando não existe estado final também não consigo testar
+             * */
+
+            //exibir que não foi possível realizar o teste porque não existe FINAL
+            return false;
+        }
+        else
+        {
+            /**
+             * Se entrou no else eu consigo realizar o teste
+             * */
+            //vou ir testando os estados e transições
+            i=0;
+            while(i<entrada.length())
+            {
+                atual = proximoEstado(atual, entrada.charAt(i));
+                if(atual == null)
+                    return false;
+
+                i++; //continuo o meu teste
+            }
+            if(atual.getFim() == 1) //se verdade então meu último estado é válido
+                return true;
+            return false;
+        }
+    }
+
+    //função para pegar o estado inicial da minha lista de estados
+    private Estado getEstadoInicial()
+    {
+        for (Estado estado: estadoList)
+        {
+            if(estado.getInicio() == 1)
+                return estado;
+        }
+        return null;
+    }
+
+    //função para verificar se existe pelo menos um estado final
+    private boolean existeEstadoFinal()
+    {
+        for (Estado estado: estadoList)
+        {
+            if(estado.getFim() == 1)
+                return true;
+        }
+        return false;
+    }
+
+    private Estado proximoEstado(Estado atual, char simboloLido)
+    {
+        List<Transicao> opcoes = getTransicoes(atual);
+        for(Transicao t : opcoes)
+        {
+            if(t.getCharacteres().contains(simboloLido))
+                return t.getDestino();
+        }
+        return null;
+    }
+
+    private List<Transicao> getTransicoes(Estado atual)
+    {
+        List<Transicao> opcoes = new ArrayList<>();
+        int pos = 0;
+        for(Transicao t: transicaoList)
+        {
+            if(t.getOrigem().equals(atual))
+                opcoes.add(transicaoList.get(pos));
+
+            pos++;
+        }
+        return opcoes;
     }
 }

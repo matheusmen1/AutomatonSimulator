@@ -82,33 +82,5 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
-
     }
-    public interface OnNewEnterClickListener{
-        void onNewEnterClick();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_direita, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(actionBarDrawerToggle.onOptionsItemSelected(item))
-            return true;
-        if (item.getItemId() == R.id.it_newEnter)
-        {
-            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-            if (currentFragment instanceof OnNewEnterClickListener) {
-                ((OnNewEnterClickListener) currentFragment).onNewEnterClick();
-            }
-
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
 }

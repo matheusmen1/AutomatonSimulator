@@ -90,6 +90,7 @@ public class ExpressaoRegularFragment extends Fragment {
         });
         return view;
     }
+
     private void achaPalavra()
     {
         List<String> fila = new ArrayList<>();
@@ -162,6 +163,7 @@ public class ExpressaoRegularFragment extends Fragment {
         }
 
     }
+
     private List<String> ordenarLista(List<String> lista)
     {
         List<String> aux;
@@ -183,6 +185,7 @@ public class ExpressaoRegularFragment extends Fragment {
         }
         return aux;
     }
+
     private void testar(View view)
     {
         listaOrdenada.clear();
@@ -203,16 +206,14 @@ public class ExpressaoRegularFragment extends Fragment {
             mostrarPalavrasNoTextView(lista);
             if (matcher.matches())
             {
-                Toast.makeText(view.getContext(), "Entrada ACEITA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "Entrada ACEITA!", Toast.LENGTH_SHORT).show();
             }
             else
             {
-                Toast.makeText(view.getContext(), "Entrada REJEITADA", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "Entrada REJEITADA!!", Toast.LENGTH_SHORT).show();
             }
         }
         else
-            Toast.makeText(view.getContext(), "Expressão Regular INCORRETA", Toast.LENGTH_SHORT).show();
-
-
+            Toast.makeText(view.getContext(), "Expressão Regular INCORRETA!!", Toast.LENGTH_SHORT).show();
     }
 }
