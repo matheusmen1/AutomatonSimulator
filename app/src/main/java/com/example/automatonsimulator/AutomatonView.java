@@ -28,20 +28,24 @@ public class AutomatonView extends View
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
+        //para desenhar o circulo
         Paint paint = new Paint();
         paint.setColor(Color.parseColor("#2f2c79"));
         paint.setStyle(Paint.Style.FILL);
 
+        //para desenhar a borda de estado final
         Paint paintBorda = new Paint();
         paintBorda.setColor(Color.WHITE);
         paintBorda.setStyle(Paint.Style.STROKE);
         paintBorda.setStrokeWidth(5);
 
+        //para desenhar o texto
         Paint textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(40);
         textPaint.setTextAlign(Paint.Align.CENTER);
 
+        //para desenhar o triangulo de inicio
         Paint paintTriangulo = new Paint();
         paintTriangulo.setColor(Color.parseColor("#2f2c79"));
         paintTriangulo.setStyle(Paint.Style.FILL);
