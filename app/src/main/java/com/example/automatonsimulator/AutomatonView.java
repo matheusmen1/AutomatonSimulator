@@ -17,6 +17,7 @@ import java.util.List;
 public class AutomatonView extends View
 {
     private List<Estado> estadoList = new ArrayList<>();
+    private Estado atual;
 
     public AutomatonView(Context context) {
         super(context);
@@ -27,11 +28,28 @@ public class AutomatonView extends View
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        atual = AutomatoFinitoFragment.atual;
 
         //para desenhar o circulo
         Paint paint = new Paint();
         paint.setColor(Color.parseColor("#2f2c79"));
         paint.setStyle(Paint.Style.FILL);
+
+        //para desenhar o circulo atual
+        Paint paintAtual = new Paint();
+        paintAtual.setColor(Color.parseColor("#F4A460")); //uma cor mais clara
+        paintAtual.setStyle(Paint.Style.FILL);
+
+        //para desenhar o circulo atual
+        Paint paintErrado = new Paint();
+        paintErrado.setColor(Color.parseColor("#B22222"));
+        paintErrado.setStyle(Paint.Style.FILL);
+
+        //para desenhar o circulo correto
+        Paint paintCerto = new Paint();
+        paintCerto.setColor(Color.parseColor("#00FF00"));
+        paintCerto.setStyle(Paint.Style.FILL);
+
 
         //para desenhar a borda de estado final
         Paint paintBorda = new Paint();
@@ -54,8 +72,43 @@ public class AutomatonView extends View
         while (i < estadoList.size())
         {
             Estado estado = estadoList.get(i);
-            canvas.drawCircle(estado.getX(), estado.getY(), 70, paint);
-            canvas.drawText(estado.getNum(), estado.getX(), estado.getY() + 15, textPaint);
+
+            if(AutomatoFinitoFragment.flagStep == 1)
+            {
+                if(atual != null)
+                {
+                    if(atual == estado)
+                    {
+                        if(AutomatoFinitoFragment.indiceAtual == AutomatoFinitoFragment.tvEntrada.getText().toString().length())
+                        {
+                            if(estado.getFim() == 1)
+                            {
+                                //deu certo
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintCerto);
+                            }
+                            else
+                            {
+                                //deu errado
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
+                            }
+                        }
+                        else
+                        {
+                            canvas.drawCircle(estado.getX(), estado.getY(), 70, paintAtual);
+                        }
+                    }
+                }
+                else
+                {
+                    canvas.drawCircle(estado.getX(), estado.getY(), 70, paint);
+                }
+            }
+            else
+            {
+                canvas.drawCircle(estado.getX(), estado.getY(), 70, paint);
+            }
+
+            canvas.drawText(estado.getNum(), estado.getX(), estado.getY() + 15, textPaint); //desenha texto
 
             if(estado.getFim() == 1 && estado.getInicio() == 1)
             {
@@ -85,7 +138,6 @@ public class AutomatonView extends View
                 canvas.drawCircle(estado.getX(), estado.getY(), 70, paintBorda);
             }
 
-
             i++;
         }
 
@@ -103,6 +155,10 @@ public class AutomatonView extends View
     public void atualizarEstado(Estado estado, int i)
     {
         estadoList.set(i, estado);
+        invalidate();
+    }
+    public void atualizar()
+    {
         invalidate();
     }
 }

@@ -7,6 +7,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
@@ -37,8 +38,9 @@ import java.util.List;
  */
 public class AutomatoFinitoFragment extends Fragment {
     private float X, Y, offSetX = 0, offSetY =0 ;
-    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
-    private Button btNew, btMove, btEdit, btDel, btLig;
+    public static int flagStep = 0;
+    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0, flagDegug = 0;
+    private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop;
     AutomatonView automatonView;
     TransicaoView transicaoView;
     List<Estado> estadoList = new ArrayList<>();
@@ -46,8 +48,10 @@ public class AutomatoFinitoFragment extends Fragment {
     LinkedList<Integer> excluidoList = new LinkedList<>();
     MenuItem it_final, it_inicial;
     public int cont = 0, index = -1;
-    private TextView tvEntrada;
+    public static TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
+    public static Estado atual;
+    public static int indiceAtual;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -106,6 +110,15 @@ public class AutomatoFinitoFragment extends Fragment {
         }
         else if(item.getItemId() == R.id.it_step)
         {
+            //eu defino o estado inicial para a depuração
+            atual = getEstadoInicial();
+            if(atual != null && existeEstadoFinal() && transicaoList.size() > 0)
+            {
+                flagStep = 1;
+                indiceAtual = 0;
+                ativar(); //ativa o modo de depuração
+            }
+
             Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
         }
         else if(item.getItemId() == R.id.it_quickRun)
@@ -132,6 +145,9 @@ public class AutomatoFinitoFragment extends Fragment {
         btEdit = view.findViewById(R.id.btEdit);
         btMove = view.findViewById(R.id.btMove);
         btLig = view.findViewById(R.id.btLig);
+        btStepNext = view.findViewById(R.id.btStepNext);
+        btStepRun = view.findViewById(R.id.btStepRun);
+        btStepStop = view.findViewById(R.id.btStepStop);
         automatonView = view.findViewById(R.id.automatoView);
         transicaoView = view.findViewById(R.id.transicaoView);
         tvEntrada = view.findViewById(R.id.tvEntrada);
@@ -199,6 +215,53 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagLig = 1;
                 updateButtonElevation(btLig);
             }
+        });
+
+        //botões para a depuração
+        btStepNext.setVisibility(View.INVISIBLE);
+        btStepNext.setOnClickListener(v->{
+            //esse botão possui a cor android:color/holo_green_dark
+            atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+            if(atual == null)
+            {
+                //deu pau
+                btStepNext.setVisibility(View.INVISIBLE);
+                btStepRun.setVisibility(View.INVISIBLE);
+                automatonView.atualizar();
+                indiceAtual = 0;
+            }
+            else
+            {
+                indiceAtual++;
+                if(indiceAtual == tvEntrada.getText().toString().length())
+                {
+                    //cheguei ao final
+                    if(atual.getFim() == 1)
+                    {
+                        btStepNext.setVisibility(View.INVISIBLE);
+                        btStepRun.setVisibility(View.INVISIBLE);
+                    }
+                    else
+                    {
+                        //deu pau
+                        btStepNext.setVisibility(View.INVISIBLE);
+                        btStepRun.setVisibility(View.INVISIBLE);
+                    }
+                }
+                automatonView.atualizar();
+            }
+        });
+        btStepRun.setVisibility(View.INVISIBLE);
+        btStepRun.setOnClickListener(v->{
+            //esse botão possui a cor android:color/system_control_activated_dark
+
+        });
+        btStepStop.setVisibility(View.INVISIBLE);
+        btStepStop.setOnClickListener(v->{
+            //esse botão possui a cor android:color/system_error_800
+            voltar(); //saio do modo de depuração
+            flagStep = 0;
+            automatonView.atualizar();
         });
 
         //a cada clique na tela, verificar o botão ativo e a sua respectiva ação
@@ -528,6 +591,34 @@ public class AutomatoFinitoFragment extends Fragment {
         return view;
     }
 
+    private void voltar()
+    {
+        atual = null;
+
+        btStepNext.setVisibility(View.INVISIBLE);
+        btStepStop.setVisibility(View.INVISIBLE);
+        btStepRun.setVisibility(View.INVISIBLE);
+
+        btMove.setVisibility(View.VISIBLE);
+        btNew.setVisibility(View.VISIBLE);
+        btEdit.setVisibility(View.VISIBLE);
+        btDel.setVisibility(View.VISIBLE);
+        btLig.setVisibility(View.VISIBLE);
+    }
+
+    private void ativar()
+    {
+        btStepNext.setVisibility(View.VISIBLE);
+        btStepStop.setVisibility(View.VISIBLE);
+        btStepRun.setVisibility(View.VISIBLE);
+
+        btMove.setVisibility(View.INVISIBLE);
+        btNew.setVisibility(View.INVISIBLE);
+        btEdit.setVisibility(View.INVISIBLE);
+        btDel.setVisibility(View.INVISIBLE);
+        btLig.setVisibility(View.INVISIBLE);
+    }
+
     public void ordenarLista()
     {
         int aux;
@@ -577,6 +668,7 @@ public class AutomatoFinitoFragment extends Fragment {
         .setView(input)
         .setPositiveButton("Ok", (dialog, which) -> {
             tvEntrada.setText(input.getText().toString());
+            tvEntrada.setTextColor(Color.parseColor("#FFFFFF")); //definindo a cor do texto para branco
         })
         .setNegativeButton("Cancel", null)
         .show();
@@ -658,6 +750,12 @@ public class AutomatoFinitoFragment extends Fragment {
              * */
 
             //exibir que não foi possível realizar o teste porque não existe FINAL
+            return false;
+        }
+        else if(transicaoList.size() == 0)
+        {
+            //aqui não existe nenhuma transição para testar
+
             return false;
         }
         else
