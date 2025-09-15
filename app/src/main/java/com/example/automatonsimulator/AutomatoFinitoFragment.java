@@ -23,7 +23,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -149,7 +151,7 @@ public class AutomatoFinitoFragment extends Fragment {
         }
         else if(item.getItemId() == R.id.it_multipleRun)
         {
-            Toast.makeText(getActivity(), "Comming Soon", Toast.LENGTH_SHORT).show();
+            novaEntradaComAdd();
         }
         else if (item.getItemId() == R.id.it_clear)
         {
@@ -818,6 +820,82 @@ public class AutomatoFinitoFragment extends Fragment {
         })
         .setNegativeButton("Cancel", null)
         .show();
+    }
+
+    private void novaEntradaComAdd() {
+        // ScrollView with LinearLayout vertical
+        ScrollView scrollView = new ScrollView(getContext());
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 40, 40, 40);
+        scrollView.addView(layout);
+
+        // button "+"
+        Button btnAdd = new Button(getContext());
+        btnAdd.setText("+");
+        btnAdd.setAllCaps(false);
+
+        btnAdd.setOnClickListener(v -> {
+            LinearLayout item = new LinearLayout(getContext());
+            item.setOrientation(LinearLayout.HORIZONTAL);
+            item.setPadding(0, 20, 0, 20);
+
+            //text field
+            EditText input = new EditText(getContext());
+            input.setHint("Input");
+            input.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+            ));
+            item.addView(input);
+
+            layout.addView(item);
+        });
+
+        // "Test" button
+        Button btnTestar = new Button(getContext());
+        btnTestar.setText("Test");
+        btnTestar.setAllCaps(false);
+
+        btnTestar.setOnClickListener(v -> {
+            for (int i = 0; i < layout.getChildCount(); i++) {
+                View child = layout.getChildAt(i);
+                if (child instanceof LinearLayout) {
+                    LinearLayout linha = (LinearLayout) child;
+                    for (int j = 0; j < linha.getChildCount(); j++) {
+                        if (linha.getChildAt(j) instanceof EditText) {
+                            EditText et = (EditText) linha.getChildAt(j);
+                            String texto = et.getText().toString();
+                            tvEntrada.setText(texto);
+
+                            if (flagAFD == 1) { // determinístico
+                                if (testaRapidoPalavraAFD()) {
+                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#008000")); // verde
+                                } else {
+                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#8B0000")); // vermelho
+                                }
+                            } else { // não determinístico
+                                if (testaRapidoPalavraAFND()) {
+                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#008000")); //verde
+                                } else {
+                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#8B0000")); //vermelho
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        //add buttons in layout
+        layout.addView(btnAdd);
+        layout.addView(btnTestar);
+
+        //build the AlertDialog
+        new AlertDialog.Builder(getContext())
+                .setTitle("Multiple Run")
+                .setView(scrollView)
+                .setPositiveButton("Close", null)
+                .show();
     }
 
     private void updateButtonElevation(Button activeButton)
