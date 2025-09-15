@@ -92,6 +92,21 @@
         android:textSize="18sp"
         app:rippleColor="@android:color/transparent" />
 
+    <Button
+        android:id="@+id/btAFD"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="630dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#40E0D0"
+        android:fontFamily="casual"
+        android:stateListAnimator="@null"
+        android:text="AFD"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:rippleColor="@android:color/transparent" />
+
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

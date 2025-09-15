@@ -17,7 +17,6 @@ import java.util.List;
 public class AutomatonView extends View
 {
     private List<Estado> estadoList = new ArrayList<>();
-    private Estado atual;
 
     public AutomatonView(Context context) {
         super(context);
@@ -28,7 +27,8 @@ public class AutomatonView extends View
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        atual = AutomatoFinitoFragment.atual;
+        Estado atual = AutomatoFinitoFragment.atual;
+        List<Estado> atuais = AutomatoFinitoFragment.atuais;
 
         //para desenhar o circulo
         Paint paint = new Paint();
@@ -40,7 +40,7 @@ public class AutomatonView extends View
         paintAtual.setColor(Color.parseColor("#8080FF")); //uma cor mais clara
         paintAtual.setStyle(Paint.Style.FILL);
 
-        //para desenhar o circulo atual
+        //para desenhar o circulo errado
         Paint paintErrado = new Paint();
         paintErrado.setColor(Color.RED);
         paintErrado.setStyle(Paint.Style.FILL);
@@ -72,33 +72,70 @@ public class AutomatonView extends View
         {
             Estado estado = estadoList.get(i);
 
-            if(AutomatoFinitoFragment.flagStep == 1 && atual != null && atual == estado)
+            if(AutomatoFinitoFragment.flagStep == 1) //modo depuração ativado
             {
-
-                if(AutomatoFinitoFragment.indiceAtual == AutomatoFinitoFragment.tvEntrada.getText().toString().length())
+                if(AutomatoFinitoFragment.flagAFD == 1) //estou tratando os Determinísticos
                 {
-                    if(estado.getFim() == 1)
+                    if(atual != null && atual == estado)
                     {
-                        //deu certo
-                        canvas.drawCircle(estado.getX(), estado.getY(), 70, paintCerto);
+                        if(AutomatoFinitoFragment.indiceAtual == AutomatoFinitoFragment.tvEntrada.getText().toString().length())
+                        {
+                            if(estado.getFim() == 1)
+                            {
+                                //deu certo
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintCerto);
+                            }
+                            else
+                            {
+                                //deu errado
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
+                            }
+                        }
+                        else
+                        {
+                            canvas.drawCircle(estado.getX(), estado.getY(), 70, paintAtual);
+                        }
+                    }
+                    else if (atual == null && estado == AutomatoFinitoFragment.anterior)
+                    {
+                        canvas.drawCircle(AutomatoFinitoFragment.anterior.getX(), AutomatoFinitoFragment.anterior.getY(), 70, paintErrado);
                     }
                     else
                     {
-                        //deu errado
-                        canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
+                        canvas.drawCircle(estado.getX(), estado.getY(), 70, paint);
                     }
                 }
-                else
+                else //estou tratando os Não Determinísticos
                 {
-                    canvas.drawCircle(estado.getX(), estado.getY(), 70, paintAtual);
+                    if(atuais != null && !atuais.isEmpty() && atuais.contains(estado))
+                    {
+                        if(AutomatoFinitoFragment.indiceAtual == AutomatoFinitoFragment.tvEntrada.getText().toString().length())
+                        {
+                            if(estado.getFim() == 1)
+                            {
+                                //deu certo
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintCerto);
+                            }
+                            else
+                            {
+                                //deu errado
+                                canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
+                            }
+                        }
+                        else
+                        {
+                            canvas.drawCircle(estado.getX(), estado.getY(), 70, paintAtual);
+                        }
+                    }
+                    else if (atuais != null && atuais.isEmpty() && AutomatoFinitoFragment.anterioes != null && AutomatoFinitoFragment.anterioes.contains(estado))
+                    {
+                        canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
+                    }
+                    else
+                    {
+                        canvas.drawCircle(estado.getX(), estado.getY(), 70, paint);
+                    }
                 }
-
-
-            }
-            else
-            if (atual == null && estado == AutomatoFinitoFragment.anterior && AutomatoFinitoFragment.flagStep == 1)
-            {
-                canvas.drawCircle(AutomatoFinitoFragment.anterior.getX(), AutomatoFinitoFragment.anterior.getY(), 70, paintErrado);
             }
             else
             {
@@ -138,21 +175,25 @@ public class AutomatonView extends View
         }
 
     }
+
     public void add(Estado estado)
     {
         estadoList.add(estado);
         invalidate();
     }
+
     public void remover(Estado estado)
     {
         estadoList.remove(estado);
         invalidate();
     }
+
     public void atualizarEstado(Estado estado, int i)
     {
         estadoList.set(i, estado);
         invalidate();
     }
+
     public void atualizar()
     {
         invalidate();

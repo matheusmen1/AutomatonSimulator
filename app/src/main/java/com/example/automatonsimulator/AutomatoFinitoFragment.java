@@ -37,10 +37,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class AutomatoFinitoFragment extends Fragment {
-    private float X, Y, offSetX = 0, offSetY =0 ;
-    public static int flagStep = 0;
+    private float X, Y, offSetX = 0, offSetY =0;
     private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
-    private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop;
+    private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop, btAFD;
     AutomatonView automatonView;
     TransicaoView transicaoView;
     List<Estado> estadoList = new ArrayList<>();
@@ -50,8 +49,14 @@ public class AutomatoFinitoFragment extends Fragment {
     public int cont = 0, index = -1;
     public static TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
+
+    //variaveis estáticas para o controle correto dos estados na depuração e testes
     public static Estado atual, anterior = null;
-    public static int indiceAtual;
+    public static List<Estado> atuais = new ArrayList<>();
+    public static List<Estado> anterioes = new ArrayList<>();
+    public static int indiceAtual; //para percorrer a palavra de entrada
+    public static int flagStep = 0;
+    public static int flagAFD = 1; //deixar padrão sempre tratar como DETERMINÍSTICO
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -111,24 +116,40 @@ public class AutomatoFinitoFragment extends Fragment {
         else if(item.getItemId() == R.id.it_step)
         {
             //eu defino o estado inicial para a depuração
+
+            //AFD
             atual = getEstadoInicial();
-            if(atual != null && existeEstadoFinal() && transicaoList.size() > 0)
+
+            //AFND
+            atuais.clear();
+            atuais.add(atual);
+
+            if(atual != null && existeEstadoFinal() /*&& transicaoList.size() > 0*/)
             {
                 flagStep = 1;
                 indiceAtual = 0;
                 automatonView.atualizar();
                 ativar(); //ativa o modo de depuração
-
             }
 
             //Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
         }
         else if(item.getItemId() == R.id.it_quickRun)
         {
-            if(testaRapidoPalavraAFD())
-                Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
+            if(flagAFD == 1) //testa o DESTERMINÍSTICO
+            {
+                if (testaRapidoPalavraAFD())
+                    Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
+            }
+            else //testa o NÃO DETERMINÍSTICO
+            {
+                if(testaRapidoPalavraAFND())
+                    Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
+            }
         }
         else if(item.getItemId() == R.id.it_multipleRun)
         {
@@ -147,6 +168,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btEdit = view.findViewById(R.id.btEdit);
         btMove = view.findViewById(R.id.btMove);
         btLig = view.findViewById(R.id.btLig);
+        btAFD = view.findViewById(R.id.btAFD);
         btStepNext = view.findViewById(R.id.btStepNext);
         btStepRun = view.findViewById(R.id.btStepRun);
         btStepStop = view.findViewById(R.id.btStepStop);
@@ -219,53 +241,118 @@ public class AutomatoFinitoFragment extends Fragment {
             }
         });
 
+        //botão de seleção de AFD () ou AFND
+        btAFD.setOnClickListener(v->{
+            if(flagAFD == 1) //deterministico ativo
+            {
+                flagAFD = 0; //ativando o não deterministico
+                btAFD.setBackgroundColor(Color.parseColor("#2F4F4F"));
+                btAFD.setTextColor(Color.parseColor("#FFFFFF"));
+                Toast.makeText(getActivity(), "Modo NÃO Determinístico", Toast.LENGTH_SHORT).show();
+            }
+            else //não deterministico
+            {
+                //não aceitar transições com palavra vazia
+                //não aceitar transições para vários estados com o mesmo símbolo
+                flagAFD = 1; //ativando o deterministico
+                btAFD.setBackgroundColor(Color.parseColor("#40E0D0"));
+                btAFD.setTextColor(Color.parseColor("#000000"));
+                Toast.makeText(getActivity(), "Modo Determinístico", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         //botões para a depuração
         btStepNext.setVisibility(View.INVISIBLE);
         btStepNext.setOnClickListener(v->{
-
-            anterior = atual;
-            if (tvEntrada.getText().toString().length() > 0)
+            if(flagAFD == 1) //DETERMINÍSTICOS
             {
-                atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
-            }
-            else
-            if (getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
-            {
-                atual = getEstadoInicial();
-            }
-            else
-            {
-                atual = null;
-            }
-            if(atual == null)
-            {
-                //deu pau
-                btStepNext.setVisibility(View.INVISIBLE);
-                btStepRun.setVisibility(View.INVISIBLE);
-                indiceAtual = 0;
-
-            }
-            else
-            {
-                indiceAtual++;
-                if(indiceAtual == tvEntrada.getText().toString().length())
+                anterior = atual;
+                if (tvEntrada.getText().toString().length() > 0)
                 {
-                    //cheguei ao final
-                    if(atual.getFim() == 1)
-                    {
-                        btStepNext.setVisibility(View.INVISIBLE);
-                        btStepRun.setVisibility(View.INVISIBLE);
-                    }
-                    else
-                    {
+                    atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+                }
+                else
+                if (getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
+                {
+                    atual = getEstadoInicial();
+                }
+                else
+                {
+                    atual = null;
+                }
+                if(atual == null)
+                {
+                    //deu pau
+                    btStepNext.setVisibility(View.INVISIBLE);
+                    btStepRun.setVisibility(View.INVISIBLE);
+                    indiceAtual = 0;
 
-                        btStepNext.setVisibility(View.INVISIBLE);
-                        btStepRun.setVisibility(View.INVISIBLE);
+                }
+                else
+                {
+                    indiceAtual++;
+                    if(indiceAtual == tvEntrada.getText().toString().length())
+                    {
+                        //cheguei ao final
+                        if(atual.getFim() == 1)
+                        {
+                            btStepNext.setVisibility(View.INVISIBLE);
+                            btStepRun.setVisibility(View.INVISIBLE);
+                        }
+                        else
+                        {
+                            btStepNext.setVisibility(View.INVISIBLE);
+                            btStepRun.setVisibility(View.INVISIBLE);
+                        }
                     }
                 }
             }
+            else //AFND
+            {
+                anterioes = atuais;
+                if (tvEntrada.getText().toString().length() > 0)
+                {
+                    atuais = proximosEstados(tvEntrada.getText().toString().charAt(indiceAtual));
+                }
+                else if (getEstadoInicial() != null && getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
+                {
+                    atuais.clear();
+                    atuais.add(getEstadoInicial());
+                }
+                else
+                {
+                    atuais.clear();
+                }
+                if(atuais.isEmpty())
+                {
+                    //deu pau
+                    btStepNext.setVisibility(View.INVISIBLE);
+                    btStepRun.setVisibility(View.INVISIBLE);
+                    indiceAtual = 0;
+                }
+                else
+                {
+                    indiceAtual++;
+                    if(indiceAtual == tvEntrada.getText().toString().length())
+                    {
+                        //cheguei ao final
+                        if(existeUmEstadoFinal())
+                        {
+                            btStepNext.setVisibility(View.INVISIBLE);
+                            btStepRun.setVisibility(View.INVISIBLE);
+                        }
+                        else
+                        {
+                            btStepNext.setVisibility(View.INVISIBLE);
+                            btStepRun.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                }
+            }
+
             automatonView.atualizar();
         });
+
         btStepRun.setVisibility(View.INVISIBLE);
         btStepRun.setOnClickListener(v->{
 
@@ -287,6 +374,7 @@ public class AutomatoFinitoFragment extends Fragment {
             btStepRun.setVisibility(View.INVISIBLE);
             automatonView.atualizar();
         });
+
         btStepStop.setVisibility(View.INVISIBLE);
         btStepStop.setOnClickListener(v->{
             //esse botão possui a cor android:color/system_error_800
@@ -763,8 +851,11 @@ public class AutomatoFinitoFragment extends Fragment {
         String entrada = tvEntrada.getText().toString();
         Estado atual = getEstadoInicial();
 
-        if(atual == null)
-        {
+        //testa o caso da palavra vazia
+        if(entrada.length() == 0 && testaVazia())
+            return true;
+
+        if (atual == null) {
             /**
              * Se verdade então não é possível o teste, pois não foi especificado
              *  o estado inicial
@@ -773,41 +864,122 @@ public class AutomatoFinitoFragment extends Fragment {
 
             //exibir que não foi possível realizar o teste porque não existe INICIAL
             return false;
-        }
-        else if(!existeEstadoFinal())
-        {
+        } else if (!existeEstadoFinal()) {
             /**
              * Quando não existe estado final também não consigo testar
              * */
 
             //exibir que não foi possível realizar o teste porque não existe FINAL
             return false;
-        }
-        else if(transicaoList.size() == 0)
-        {
+        } else if (transicaoList.size() == 0) {
             //aqui não existe nenhuma transição para testar
 
             return false;
-        }
-        else
-        {
+        } else {
             /**
              * Se entrou no else eu consigo realizar o teste
              * */
             //vou ir testando os estados e transições
-            i=0;
-            while(i<entrada.length())
-            {
+            i = 0;
+            while (i < entrada.length()) {
                 atual = proximoEstado(atual, entrada.charAt(i));
-                if(atual == null)
+                if (atual == null)
                     return false;
 
                 i++; //continuo o meu teste
             }
-            if(atual.getFim() == 1) //se verdade então meu último estado é válido
+            if (atual.getFim() == 1) //se verdade então meu último estado é válido
                 return true;
             return false;
         }
+    }
+
+    private boolean testaRapidoPalavraAFND()
+    {
+        int i;
+        String entrada = tvEntrada.getText().toString();
+
+        //testa o caso da palavra vazia
+        if(entrada.length() == 0 && testaVazia())
+            return true;
+
+        atuais.clear();
+        atuais.add(getEstadoInicial());
+        if (getEstadoInicial() == null) {
+            /**
+             * Se verdade então não é possível o teste, pois não foi especificado
+             *  o estado inicial
+             * Exibir de alguma forma isso para o usuário
+             * */
+
+            //exibir que não foi possível realizar o teste porque não existe INICIAL
+            return false;
+        } else if (!existeEstadoFinal()) {
+            /**
+             * Quando não existe estado final também não consigo testar
+             * */
+
+            //exibir que não foi possível realizar o teste porque não existe FINAL
+            return false;
+        } else if (transicaoList.size() == 0) {
+            //aqui não existe nenhuma transição para testar
+
+            return false;
+        } else {
+            /**
+             * Se entrou no else eu consigo realizar o teste
+             * */
+            //vou ir testando os estados e transições
+            i = 0;
+            while (i < entrada.length()) {
+                atuais = proximosEstados(entrada.charAt(i));
+                if (atuais.isEmpty()) //não existe nenhuma transição para ir
+                    return false;
+
+                i++; //continuo o meu teste
+            }
+            if (existeUmEstadoFinal()) //se verdade então meu último estado é válido
+                return true;
+            return false;
+        }
+    }
+
+    private List<Estado> proximosEstados(char simbolo)
+    {
+        List<Estado> proximos = new ArrayList<>();
+        for (Estado teste : atuais)
+        {
+            List<Estado> proximosTeste = proximosEstadosAFND(teste, simbolo);
+            //proximos.addAll(proximosTeste); //mesma coisa que o for abaixo
+            for(Estado retorno : proximosTeste) //adicionar os proximos de estado teste
+            {
+                if(!proximos.contains(retorno))
+                    proximos.add(retorno);
+            }
+        }
+        return proximos; //tratar depois, pois posso ter uma lista vazia, sem proximos estados
+    }
+
+    private List<Estado> proximosEstadosAFND(Estado teste, char simbolo)
+    {
+        List<Transicao> transicoes = getTransicoes(teste);
+        List<Estado> proximos = new ArrayList<>();
+        for(Transicao t : transicoes)
+        {
+            if((t.getCharacteres().contains(simbolo) || t.getCharacteres().contains('ε')) && !proximos.contains(t.getDestino()))
+                proximos.add(t.getDestino());
+        }
+        return proximos;
+    }
+
+    public static boolean existeUmEstadoFinal()
+    {
+        for(Estado pos : atuais)
+        {
+            if(pos.getFim() == 1)
+                return true; //pelo menos um existe
+        }
+        return false;
     }
 
     //função para pegar o estado inicial da minha lista de estados
@@ -855,5 +1027,11 @@ public class AutomatoFinitoFragment extends Fragment {
             pos++;
         }
         return opcoes;
+    }
+
+    private boolean testaVazia()
+    {
+        Estado inicio = getEstadoInicial();
+        return inicio != null && inicio.getInicio()==1 && inicio.getFim()==1;
     }
 }
