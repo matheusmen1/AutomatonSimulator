@@ -206,14 +206,14 @@ public class ExpressaoRegularFragment extends Fragment {
             mostrarPalavrasNoTextView(lista);
             if (matcher.matches())
             {
-                Toast.makeText(view.getContext(), "Entrada ACEITA!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "ACCEPTED Word", Toast.LENGTH_SHORT).show();
             }
             else
             {
-                Toast.makeText(view.getContext(), "Entrada REJEITADA!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), "REJECTED Word", Toast.LENGTH_SHORT).show();
             }
         }
         else
-            Toast.makeText(view.getContext(), "Expressão Regular INCORRETA!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(view.getContext(), "INCORRECT Regular Expression", Toast.LENGTH_SHORT).show();
     }
 }
