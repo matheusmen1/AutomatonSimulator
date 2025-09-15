@@ -39,7 +39,7 @@ import java.util.List;
 public class AutomatoFinitoFragment extends Fragment {
     private float X, Y, offSetX = 0, offSetY =0 ;
     public static int flagStep = 0;
-    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0, flagDegug = 0;
+    private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
     private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop;
     AutomatonView automatonView;
     TransicaoView transicaoView;
@@ -50,7 +50,7 @@ public class AutomatoFinitoFragment extends Fragment {
     public int cont = 0, index = -1;
     public static TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
-    public static Estado atual;
+    public static Estado atual, anterior = null;
     public static int indiceAtual;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -106,7 +106,7 @@ public class AutomatoFinitoFragment extends Fragment {
         if(item.getItemId() == R.id.it_newEnter)
         {
             novaEntrada();
-            Toast.makeText(getActivity(), "new enter", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "new enter", Toast.LENGTH_SHORT).show();
         }
         else if(item.getItemId() == R.id.it_step)
         {
@@ -116,17 +116,19 @@ public class AutomatoFinitoFragment extends Fragment {
             {
                 flagStep = 1;
                 indiceAtual = 0;
+                automatonView.atualizar();
                 ativar(); //ativa o modo de depuração
+
             }
 
-            Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
         }
         else if(item.getItemId() == R.id.it_quickRun)
         {
             if(testaRapidoPalavraAFD())
                 Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
             else
-                Toast.makeText(getActivity(), "Palavra REJEITADA!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
         }
         else if(item.getItemId() == R.id.it_multipleRun)
         {
@@ -220,15 +222,28 @@ public class AutomatoFinitoFragment extends Fragment {
         //botões para a depuração
         btStepNext.setVisibility(View.INVISIBLE);
         btStepNext.setOnClickListener(v->{
-            //esse botão possui a cor android:color/holo_green_dark
-            atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+
+            anterior = atual;
+            if (tvEntrada.getText().toString().length() > 0)
+            {
+                atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+            }
+            else
+            if (getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
+            {
+                atual = getEstadoInicial();
+            }
+            else
+            {
+                atual = null;
+            }
             if(atual == null)
             {
                 //deu pau
                 btStepNext.setVisibility(View.INVISIBLE);
                 btStepRun.setVisibility(View.INVISIBLE);
-                automatonView.atualizar();
                 indiceAtual = 0;
+
             }
             else
             {
@@ -243,18 +258,34 @@ public class AutomatoFinitoFragment extends Fragment {
                     }
                     else
                     {
-                        //deu pau
+
                         btStepNext.setVisibility(View.INVISIBLE);
                         btStepRun.setVisibility(View.INVISIBLE);
                     }
                 }
-                automatonView.atualizar();
             }
+            automatonView.atualizar();
         });
         btStepRun.setVisibility(View.INVISIBLE);
         btStepRun.setOnClickListener(v->{
-            //esse botão possui a cor android:color/system_control_activated_dark
 
+            int flag = 0;
+            while (indiceAtual < tvEntrada.getText().toString().length() && flag != 1)
+            {
+                anterior = atual;
+                atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+                if (atual == null)
+                {
+                    flag = 1;
+                    indiceAtual = 0;
+                }
+                else
+                    indiceAtual++;
+            }
+
+            btStepNext.setVisibility(View.INVISIBLE);
+            btStepRun.setVisibility(View.INVISIBLE);
+            automatonView.atualizar();
         });
         btStepStop.setVisibility(View.INVISIBLE);
         btStepStop.setOnClickListener(v->{
@@ -594,7 +625,7 @@ public class AutomatoFinitoFragment extends Fragment {
     private void voltar()
     {
         atual = null;
-
+        indiceAtual = 0;
         btStepNext.setVisibility(View.INVISIBLE);
         btStepStop.setVisibility(View.INVISIBLE);
         btStepRun.setVisibility(View.INVISIBLE);
