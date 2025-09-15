@@ -40,12 +40,12 @@ public class AutomatoFinitoFragment extends Fragment {
     private float X, Y, offSetX = 0, offSetY =0;
     private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
     private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop, btAFD;
-    AutomatonView automatonView;
-    TransicaoView transicaoView;
-    List<Estado> estadoList = new ArrayList<>();
-    List<Transicao> transicaoList = new ArrayList<>();
-    LinkedList<Integer> excluidoList = new LinkedList<>();
-    MenuItem it_final, it_inicial;
+    private AutomatonView automatonView;
+    private TransicaoView transicaoView;
+    private List<Estado> estadoList = new ArrayList<>();
+    private List<Transicao> transicaoList = new ArrayList<>();
+    private LinkedList<Integer> excluidoList = new LinkedList<>();
+    private MenuItem it_final, it_inicial;
     public int cont = 0, index = -1;
     public static TextView tvEntrada;
     private Estado EstadoIniLig, EstadoFimLig;
@@ -53,7 +53,7 @@ public class AutomatoFinitoFragment extends Fragment {
     //variaveis estáticas para o controle correto dos estados na depuração e testes
     public static Estado atual, anterior = null;
     public static List<Estado> atuais = new ArrayList<>();
-    public static List<Estado> anterioes = new ArrayList<>();
+    public static List<Estado> anteriores = new ArrayList<>();
     public static int indiceAtual; //para percorrer a palavra de entrada
     public static int flagStep = 0;
     public static int flagAFD = 1; //deixar padrão sempre tratar como DETERMINÍSTICO
@@ -108,15 +108,12 @@ public class AutomatoFinitoFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.it_newEnter)
+        if(item.getItemId() == R.id.it_newEnter) //nova entrada de palavra
         {
             novaEntrada();
-            //Toast.makeText(getActivity(), "new enter", Toast.LENGTH_SHORT).show();
         }
-        else if(item.getItemId() == R.id.it_step)
+        else if(item.getItemId() == R.id.it_step) //modo de depuração
         {
-            //eu defino o estado inicial para a depuração
-
             //AFD
             atual = getEstadoInicial();
 
@@ -124,17 +121,16 @@ public class AutomatoFinitoFragment extends Fragment {
             atuais.clear();
             atuais.add(atual);
 
-            if(atual != null && existeEstadoFinal() /*&& transicaoList.size() > 0*/)
+            if(atual != null && existeEstadoFinal())
             {
                 flagStep = 1;
                 indiceAtual = 0;
                 automatonView.atualizar();
                 ativar(); //ativa o modo de depuração
+                Toast.makeText(getActivity(), "Modo de DEPURAÇÃO", Toast.LENGTH_SHORT).show();
             }
-
-            //Toast.makeText(getActivity(), "step by step", Toast.LENGTH_SHORT).show();
         }
-        else if(item.getItemId() == R.id.it_quickRun)
+        else if(item.getItemId() == R.id.it_quickRun) //teste rápido
         {
             if(flagAFD == 1) //testa o DESTERMINÍSTICO
             {
@@ -178,67 +174,46 @@ public class AutomatoFinitoFragment extends Fragment {
 
         //animação para bt new começa ativado
         updateButtonElevation(btNew);
-
         //os botões clicados, cada um com sua função
-        btNew.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "Modo Adição ATIVADO", Toast.LENGTH_SHORT).show();
-                flagNew = 1;
-                flagDel = 0;
-                flagEdit = 0;
-                flagMove = 0;
-                flagLig = 0;
-                updateButtonElevation(btNew);
-            }
+        btNew.setOnClickListener(v-> {
+            flagNew = 1;
+            flagDel = 0;
+            flagEdit = 0;
+            flagMove = 0;
+            flagLig = 0;
+            updateButtonElevation(btNew);
         });
-        btMove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "Modo Mover ATIVADO", Toast.LENGTH_SHORT).show();
-                flagNew = 0;
-                flagDel = 0;
-                flagEdit = 0;
-                flagMove = 1;
-                flagLig = 0;
-                updateButtonElevation(btMove);
-            }
+        btMove.setOnClickListener(v -> {
+            flagNew = 0;
+            flagDel = 0;
+            flagEdit = 0;
+            flagMove = 1;
+            flagLig = 0;
+            updateButtonElevation(btMove);
         });
-        btDel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "Modo Deletar ATIVADO ", Toast.LENGTH_SHORT).show();
-                flagNew = 0;
-                flagDel = 1;
-                flagEdit = 0;
-                flagMove = 0;
-                flagLig = 0;
-                updateButtonElevation(btDel);
-            }
+        btDel.setOnClickListener(v -> {
+            flagNew = 0;
+            flagDel = 1;
+            flagEdit = 0;
+            flagMove = 0;
+            flagLig = 0;
+            updateButtonElevation(btDel);
         });
-        btEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "Modo Edição ATIVADO ", Toast.LENGTH_SHORT).show();
-                flagNew = 0;
-                flagDel = 0;
-                flagEdit = 1;
-                flagMove = 0;
-                flagLig = 0;
-                updateButtonElevation(btEdit);
-            }
+        btEdit.setOnClickListener(v -> {
+            flagNew = 0;
+            flagDel = 0;
+            flagEdit = 1;
+            flagMove = 0;
+            flagLig = 0;
+            updateButtonElevation(btEdit);
         });
-        btLig.setOnClickListener( new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                //Toast.makeText(view.getContext(), "Modo Ligação ATIVADO ", Toast.LENGTH_SHORT).show();
-                flagNew = 0;
-                flagDel = 0;
-                flagEdit = 0;
-                flagMove = 0;
-                flagLig = 1;
-                updateButtonElevation(btLig);
-            }
+        btLig.setOnClickListener(v -> {
+            flagNew = 0;
+            flagDel = 0;
+            flagEdit = 0;
+            flagMove = 0;
+            flagLig = 1;
+            updateButtonElevation(btLig);
         });
 
         //botão de seleção de AFD () ou AFND
@@ -252,8 +227,8 @@ public class AutomatoFinitoFragment extends Fragment {
             }
             else //não deterministico
             {
-                //não aceitar transições com palavra vazia
-                //não aceitar transições para vários estados com o mesmo símbolo
+                //não aceitar transições com palavra vazia (tratar)
+                //não aceitar transições para vários estados com o mesmo símbolo (tratar)
                 flagAFD = 1; //ativando o deterministico
                 btAFD.setBackgroundColor(Color.parseColor("#40E0D0"));
                 btAFD.setTextColor(Color.parseColor("#000000"));
@@ -262,7 +237,7 @@ public class AutomatoFinitoFragment extends Fragment {
         });
 
         //botões para a depuração
-        btStepNext.setVisibility(View.INVISIBLE);
+        btStepNext.setVisibility(View.INVISIBLE); //começa invisível por default
         btStepNext.setOnClickListener(v->{
             if(flagAFD == 1) //DETERMINÍSTICOS
             {
@@ -272,7 +247,7 @@ public class AutomatoFinitoFragment extends Fragment {
                     atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
                 }
                 else
-                if (getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
+                if (getEstadoInicial() != null && getEstadoInicial().getFim() == 1 && getEstadoInicial().getInicio() == 1)
                 {
                     atual = getEstadoInicial();
                 }
@@ -309,7 +284,7 @@ public class AutomatoFinitoFragment extends Fragment {
             }
             else //AFND
             {
-                anterioes = atuais;
+                anteriores = atuais;
                 if (tvEntrada.getText().toString().length() > 0)
                 {
                     atuais = proximosEstados(tvEntrada.getText().toString().charAt(indiceAtual));
@@ -353,23 +328,40 @@ public class AutomatoFinitoFragment extends Fragment {
             automatonView.atualizar();
         });
 
-        btStepRun.setVisibility(View.INVISIBLE);
+        btStepRun.setVisibility(View.INVISIBLE); //começa invisível por default
         btStepRun.setOnClickListener(v->{
-
-            int flag = 0;
-            while (indiceAtual < tvEntrada.getText().toString().length() && flag != 1)
+            if(flagAFD == 1) //AFD
             {
-                anterior = atual;
-                atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
-                if (atual == null)
+                int flag = 0;
+                while (indiceAtual < tvEntrada.getText().toString().length() && flag != 1)
                 {
-                    flag = 1;
-                    indiceAtual = 0;
+                    anterior = atual;
+                    atual = proximoEstado(atual, tvEntrada.getText().toString().charAt(indiceAtual));
+                    if (atual == null)
+                    {
+                        flag = 1;
+                        indiceAtual = 0;
+                    }
+                    else
+                        indiceAtual++;
                 }
-                else
-                    indiceAtual++;
             }
-
+            else //AFND
+            {
+                int flag = 0;
+                while (indiceAtual < tvEntrada.getText().toString().length() && flag != 1)
+                {
+                    anteriores = atuais;
+                    atuais = proximosEstados(tvEntrada.getText().toString().charAt(indiceAtual));
+                    if (atuais.isEmpty())
+                    {
+                        flag = 1;
+                        indiceAtual = 0;
+                    }
+                    else
+                        indiceAtual++;
+                }
+            }
             btStepNext.setVisibility(View.INVISIBLE);
             btStepRun.setVisibility(View.INVISIBLE);
             automatonView.atualizar();
@@ -547,7 +539,7 @@ public class AutomatoFinitoFragment extends Fragment {
                                 automatonView.remover(estado);
                                 flag = 1;
                                 excluidoList.addFirst(Integer.parseInt(estado.getNum().substring(1)));
-                                ordenarLista();
+                                excluidoList.sort(null);
                             }
                             i++;
                         }
@@ -738,25 +730,8 @@ public class AutomatoFinitoFragment extends Fragment {
         btLig.setVisibility(View.INVISIBLE);
     }
 
-    public void ordenarLista()
+    public List<Character> characteresObtidos(String stringLida)
     {
-        int aux;
-        for (int i = 0; i < excluidoList.size(); i++)
-        {
-            for (int j = i + 1; j < excluidoList.size(); j++)
-            {
-                if (excluidoList.get(i) > excluidoList.get(j))
-                {
-                   aux = excluidoList.get(i);
-                   excluidoList.set(i, excluidoList.get(j));
-                   excluidoList.set(j, aux);
-                }
-            }
-        }
-
-    }
-
-    public List<Character> characteresObtidos(String stringLida){
         Character character;
         List<Character> lista = new ArrayList<>();
 
@@ -793,7 +768,8 @@ public class AutomatoFinitoFragment extends Fragment {
         .show();
     }
 
-    private void updateButtonElevation(Button activeButton) {
+    private void updateButtonElevation(Button activeButton)
+    {
         Button[] allButtons = {btNew, btMove, btEdit, btDel, btLig};
 
         float activeElevation = TypedValue.applyDimension(
@@ -863,17 +839,20 @@ public class AutomatoFinitoFragment extends Fragment {
              * */
 
             //exibir que não foi possível realizar o teste porque não existe INICIAL
+            Toast.makeText(getActivity(), "Não existe onde INICIAR", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!existeEstadoFinal()) {
             /**
              * Quando não existe estado final também não consigo testar
              * */
 
+            Toast.makeText(getActivity(), "Não existe nenhum estado FINAL", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe FINAL
             return false;
         } else if (transicaoList.size() == 0) {
             //aqui não existe nenhuma transição para testar
 
+            Toast.makeText(getActivity(), "Não possui nenhuma TRANSIÇÃO", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             /**
@@ -912,6 +891,7 @@ public class AutomatoFinitoFragment extends Fragment {
              * Exibir de alguma forma isso para o usuário
              * */
 
+            Toast.makeText(getActivity(), "Não existe onde INICIAR", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe INICIAL
             return false;
         } else if (!existeEstadoFinal()) {
@@ -919,11 +899,13 @@ public class AutomatoFinitoFragment extends Fragment {
              * Quando não existe estado final também não consigo testar
              * */
 
+            Toast.makeText(getActivity(), "Não existe nenhum estado FINAL", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe FINAL
             return false;
         } else if (transicaoList.size() == 0) {
             //aqui não existe nenhuma transição para testar
 
+            Toast.makeText(getActivity(), "Não possui nenhuma TRANSIÇÃO", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             /**

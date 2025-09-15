@@ -127,7 +127,7 @@ public class AutomatonView extends View
                             canvas.drawCircle(estado.getX(), estado.getY(), 70, paintAtual);
                         }
                     }
-                    else if (atuais != null && atuais.isEmpty() && AutomatoFinitoFragment.anterioes != null && AutomatoFinitoFragment.anterioes.contains(estado))
+                    else if (atuais != null && atuais.isEmpty() && AutomatoFinitoFragment.anteriores != null && AutomatoFinitoFragment.anteriores.contains(estado))
                     {
                         canvas.drawCircle(estado.getX(), estado.getY(), 70, paintErrado);
                     }
