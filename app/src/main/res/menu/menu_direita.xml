@@ -13,4 +13,7 @@
     <item
         android:id="@+id/it_multipleRun"
         android:title="Multiple Run" />
+    <item
+        android:id="@+id/it_clear"
+        android:title="Clear" />
 </menu>

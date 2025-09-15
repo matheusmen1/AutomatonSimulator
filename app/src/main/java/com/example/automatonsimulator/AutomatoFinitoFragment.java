@@ -125,9 +125,9 @@ public class AutomatoFinitoFragment extends Fragment {
             {
                 flagStep = 1;
                 indiceAtual = 0;
-                automatonView.atualizar();
+                automatonView.atualizar(0);
                 ativar(); //ativa o modo de depuração
-                Toast.makeText(getActivity(), "Modo de DEPURAÇÃO", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Modo de DEPURAÇÃO", Toast.LENGTH_SHORT).show();
             }
         }
         else if(item.getItemId() == R.id.it_quickRun) //teste rápido
@@ -135,21 +135,25 @@ public class AutomatoFinitoFragment extends Fragment {
             if(flagAFD == 1) //testa o DESTERMINÍSTICO
             {
                 if (testaRapidoPalavraAFD())
-                    Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "ACCEPTED Word", Toast.LENGTH_SHORT).show();
                 else
-                    Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "REJECTED Word", Toast.LENGTH_SHORT).show();
             }
             else //testa o NÃO DETERMINÍSTICO
             {
                 if(testaRapidoPalavraAFND())
-                    Toast.makeText(getActivity(), "Palavra ACEITA!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "ACCEPTED Word", Toast.LENGTH_SHORT).show();
                 else
-                    Toast.makeText(getActivity(), "Palavra REJEITADA!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "REJECTED Word", Toast.LENGTH_SHORT).show();
             }
         }
         else if(item.getItemId() == R.id.it_multipleRun)
         {
-            Toast.makeText(getActivity(), "multiple run", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Comming Soon", Toast.LENGTH_SHORT).show();
+        }
+        else if (item.getItemId() == R.id.it_clear)
+        {
+            clear();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -233,7 +237,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 btAFD.setBackgroundColor(Color.parseColor("#2F4F4F"));
                 btAFD.setTextColor(Color.parseColor("#FFFFFF"));
                 btAFD.setText("AFND");
-                Toast.makeText(getActivity(), "Modo NÃO Determinístico", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Modo NÃO Determinístico", Toast.LENGTH_SHORT).show();
             }
             else //não deterministico
             {
@@ -245,8 +249,8 @@ public class AutomatoFinitoFragment extends Fragment {
                 btAFD.setText("AFD");
                 transicaoList.clear(); //limpar a lista de transições
                 transicaoView.transicoes.clear(); //limpa transições da view
-                transicaoView.atualizarLig(); //atualizo a view para melhor interface
-                Toast.makeText(getActivity(), "Modo Determinístico", Toast.LENGTH_SHORT).show();
+                transicaoView.atualizarLig(0); //atualizo a view para melhor interface
+                //Toast.makeText(getActivity(), "Modo Determinístico", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -339,7 +343,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 }
             }
 
-            automatonView.atualizar();
+            automatonView.atualizar(0);
         });
 
         btStepRun.setVisibility(View.INVISIBLE); //começa invisível por default
@@ -378,7 +382,7 @@ public class AutomatoFinitoFragment extends Fragment {
             }
             btStepNext.setVisibility(View.INVISIBLE);
             btStepRun.setVisibility(View.INVISIBLE);
-            automatonView.atualizar();
+            automatonView.atualizar(0);
         });
 
         btStepStop.setVisibility(View.INVISIBLE);
@@ -386,7 +390,7 @@ public class AutomatoFinitoFragment extends Fragment {
             //esse botão possui a cor android:color/system_error_800
             voltar(); //saio do modo de depuração
             flagStep = 0;
-            automatonView.atualizar();
+            automatonView.atualizar(0);
         });
 
         //a cada clique na tela, verificar o botão ativo e a sua respectiva ação
@@ -648,11 +652,11 @@ public class AutomatoFinitoFragment extends Fragment {
 
                                             if(flagAFD == 1 && coletado.isEmpty()) //não posso permitir
                                             {
-                                                Toast.makeText(getActivity(), "Transição Não Permitida", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Transition Not Allowed", Toast.LENGTH_SHORT).show();
                                             }
                                             else if(flagAFD == 1 && !transicaoValida(EstadoIniLig, coletado))
                                             {
-                                                Toast.makeText(getActivity(), "Transição Não Permitida", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Transition Not Allowed", Toast.LENGTH_SHORT).show();
                                             }
                                             else
                                             {
@@ -693,7 +697,7 @@ public class AutomatoFinitoFragment extends Fragment {
                                                     transicaoView.addLista(transicao);
                                                 }
                                                 else
-                                                    transicaoView.atualizarLig();
+                                                    transicaoView.atualizarLig(0);
                                             }
                                         })
                                         .setNegativeButton("Cancel", null)
@@ -712,7 +716,7 @@ public class AutomatoFinitoFragment extends Fragment {
                         estado.setX(event.getX() - offSetX);
                         estado.setY(event.getY() - offSetY);
                         automatonView.atualizarEstado(estado, index);
-                        transicaoView.atualizarLig();
+                        transicaoView.atualizarLig(0);
                     }
 
                 }
@@ -804,7 +808,7 @@ public class AutomatoFinitoFragment extends Fragment {
             }
             if(flag == 1) //deu errado
             {
-                Toast.makeText(getActivity(), "Entrada NÃO PERMITIDA!!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Input Not Allowed", Toast.LENGTH_SHORT).show();
             }
             else
             {
@@ -887,20 +891,20 @@ public class AutomatoFinitoFragment extends Fragment {
              * */
 
             //exibir que não foi possível realizar o teste porque não existe INICIAL
-            Toast.makeText(getActivity(), "Não existe onde INICIAR", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "There Is No Place To START", Toast.LENGTH_SHORT).show();
             return false;
         } else if (!existeEstadoFinal()) {
             /**
              * Quando não existe estado final também não consigo testar
              * */
 
-            Toast.makeText(getActivity(), "Não existe nenhum estado FINAL", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "There Is No FINAL State", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe FINAL
             return false;
         } else if (transicaoList.size() == 0) {
             //aqui não existe nenhuma transição para testar
 
-            Toast.makeText(getActivity(), "Não possui nenhuma TRANSIÇÃO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "It Has No TRANSITION", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             /**
@@ -939,7 +943,7 @@ public class AutomatoFinitoFragment extends Fragment {
              * Exibir de alguma forma isso para o usuário
              * */
 
-            Toast.makeText(getActivity(), "Não existe onde INICIAR", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "There Is No Place To START", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe INICIAL
             return false;
         } else if (!existeEstadoFinal()) {
@@ -947,13 +951,13 @@ public class AutomatoFinitoFragment extends Fragment {
              * Quando não existe estado final também não consigo testar
              * */
 
-            Toast.makeText(getActivity(), "Não existe nenhum estado FINAL", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "There Is No FINAL State", Toast.LENGTH_SHORT).show();
             //exibir que não foi possível realizar o teste porque não existe FINAL
             return false;
         } else if (transicaoList.size() == 0) {
             //aqui não existe nenhuma transição para testar
 
-            Toast.makeText(getActivity(), "Não possui nenhuma TRANSIÇÃO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "It Has No TRANSITION", Toast.LENGTH_SHORT).show();
             return false;
         } else {
             /**
@@ -1080,5 +1084,15 @@ public class AutomatoFinitoFragment extends Fragment {
             }
         }
         return true;
+    }
+    private void clear()
+    {
+        estadoList.clear();
+        transicaoList.clear();
+        excluidoList.clear();
+        automatonView.atualizar(1);
+        transicaoView.atualizarLig(1);
+        tvEntrada.setText("");
+        cont = 0;
     }
 }

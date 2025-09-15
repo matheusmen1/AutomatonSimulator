@@ -87,7 +87,7 @@
         android:backgroundTint="#2f2c79"
         android:fontFamily="casual"
         android:stateListAnimator="@null"
-        android:text="LIG"
+        android:text="CON"
         android:textColor="#F0F0F0"
         android:textSize="18sp"
         app:rippleColor="@android:color/transparent" />
@@ -105,6 +105,7 @@
         android:text="AFD"
         android:textColor="#000000"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:rippleColor="@android:color/transparent" />
 
     <androidx.cardview.widget.CardView

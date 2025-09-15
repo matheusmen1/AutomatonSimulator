@@ -296,8 +296,13 @@ public class TransicaoView extends View {
         invalidate();
     }
 
-    public void atualizarLig()
+    public void atualizarLig(int apagar)
     {
+        if (apagar == 1)
+        {
+            transicoes.clear();
+            opostos.clear();
+        }
         invalidate();
     }
 
@@ -314,4 +319,5 @@ public class TransicaoView extends View {
         }
         return -1;
     }
+
 }

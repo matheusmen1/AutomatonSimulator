@@ -4,14 +4,17 @@
 
     <item
         android:id="@+id/it_expressao"
-        android:title="Expressão Regular" />
+        android:title="Regular Expression " />
     <item
         android:id="@+id/it_automato"
-        android:title="Autômato Finito" />
+        android:title="Finite Automata" />
     <item
         android:id="@+id/it_gramatica"
-        android:title="Gramática Regular" />
+        android:title="Regular Grammar" />
+    <item
+        android:id="@+id/it_dev"
+        android:title="Developers" />
     <item
         android:id="@+id/it_sair"
-        android:title="Sair" />
+        android:title="Close" />
 </menu>

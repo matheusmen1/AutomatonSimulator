@@ -194,8 +194,10 @@ public class AutomatonView extends View
         invalidate();
     }
 
-    public void atualizar()
+    public void atualizar(int apagar)
     {
+        if (apagar == 1)
+            estadoList.clear();
         invalidate();
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">""</string>
+    <string name="app_name">"Finite Automaton Simulator"</string>
     <string name="open_menu">Abrir</string>
     <string name="close_menu">Fechar</string>
     <!-- TODO: Remove or change this placeholder text -->
