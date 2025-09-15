@@ -157,6 +157,15 @@ public class AutomatoFinitoFragment extends Fragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View decorView = requireActivity().getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+        );
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_automato_finito, container, false);
         btNew = view.findViewById(R.id.btNew);
@@ -730,6 +739,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btEdit.setVisibility(View.VISIBLE);
         btDel.setVisibility(View.VISIBLE);
         btLig.setVisibility(View.VISIBLE);
+        btAFD.setVisibility(View.VISIBLE);
     }
 
     private void ativar()
@@ -743,6 +753,7 @@ public class AutomatoFinitoFragment extends Fragment {
         btEdit.setVisibility(View.INVISIBLE);
         btDel.setVisibility(View.INVISIBLE);
         btLig.setVisibility(View.INVISIBLE);
+        btAFD.setVisibility(View.INVISIBLE);
     }
 
     public List<Character> characteresObtidos(String stringLida)
@@ -753,11 +764,19 @@ public class AutomatoFinitoFragment extends Fragment {
         for (int i=0; i<stringLida.length(); i++)
         {
             character = stringLida.charAt(i);
-            if(!lista.contains(character)){
+            if(!lista.contains(character) && verificaSimbolo(character)){
                 lista.add(character);
             }
         }
         return lista;
+    }
+
+    private boolean verificaSimbolo(Character simbolo) {
+        if (simbolo == null) return false;
+        char c = simbolo.charValue();
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9');
     }
 
     public Transicao procuraTransicao(Estado estado)
@@ -776,8 +795,22 @@ public class AutomatoFinitoFragment extends Fragment {
         .setTitle("Enter Input")
         .setView(input)
         .setPositiveButton("Ok", (dialog, which) -> {
-            tvEntrada.setText(input.getText().toString());
-            tvEntrada.setTextColor(Color.parseColor("#FFFFFF")); //definindo a cor do texto para branco
+            int flag = 0;
+            int tam = input.getText().toString().length();
+            for(int i=0; i<tam && flag!=1; i++)
+            {
+                if(!verificaSimbolo(input.getText().toString().charAt(i)))
+                    flag = 1;
+            }
+            if(flag == 1) //deu errado
+            {
+                Toast.makeText(getActivity(), "Entrada NÃO PERMITIDA!!", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                tvEntrada.setText(input.getText().toString());
+                tvEntrada.setTextColor(Color.parseColor("#FFFFFF")); //definindo a cor do texto para branco
+            }
         })
         .setNegativeButton("Cancel", null)
         .show();
@@ -1036,6 +1069,8 @@ public class AutomatoFinitoFragment extends Fragment {
     {
         List<Transicao> transicoes = getTransicoes(estado);
         List<Character> simbolos = characteresObtidos(coleta);
+        if(simbolos.isEmpty() && flagAFD == 1)
+            return false;
         for(Transicao t : transicoes)
         {
             for(Character c : simbolos)
