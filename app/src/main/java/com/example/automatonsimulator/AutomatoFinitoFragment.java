@@ -223,6 +223,7 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagAFD = 0; //ativando o não deterministico
                 btAFD.setBackgroundColor(Color.parseColor("#2F4F4F"));
                 btAFD.setTextColor(Color.parseColor("#FFFFFF"));
+                btAFD.setText("AFND");
                 Toast.makeText(getActivity(), "Modo NÃO Determinístico", Toast.LENGTH_SHORT).show();
             }
             else //não deterministico
@@ -232,6 +233,10 @@ public class AutomatoFinitoFragment extends Fragment {
                 flagAFD = 1; //ativando o deterministico
                 btAFD.setBackgroundColor(Color.parseColor("#40E0D0"));
                 btAFD.setTextColor(Color.parseColor("#000000"));
+                btAFD.setText("AFD");
+                transicaoList.clear(); //limpar a lista de transições
+                transicaoView.transicoes.clear(); //limpa transições da view
+                transicaoView.atualizarLig(); //atualizo a view para melhor interface
                 Toast.makeText(getActivity(), "Modo Determinístico", Toast.LENGTH_SHORT).show();
             }
         });
@@ -627,50 +632,60 @@ public class AutomatoFinitoFragment extends Fragment {
                                         .setTitle("Enter Input")
                                         .setView(input)
                                         .setPositiveButton("Ok", (dialog, which) -> {
-                                            int flagExiste = 0;
-                                            Transicao transicao = procuraTransicao(estadoSelecionado);
-                                            if (transicao == null) //transição ainda não existia
-                                            {
-                                                transicao = new Transicao();
-                                            }
-                                            else //transição já existia
-                                                flagExiste = 1;
-
                                             //PEGAR UMA STRING COM O ALFABETO DIGITADO
                                             String coletado = input.getText().toString();
-                                            // aqui você já tem a string
-                                            //DESSA STRING, PEGAR CADA CARACTER E MANDAR PARA A LISTA DE CHARACTERES DA TRANSIÇÃO
-                                            List<Character> lista = characteresObtidos(coletado); //obter todos os caracteres diferentes da minha string
-                                            if(lista.isEmpty())
-                                                lista.add('ε');
-                                            List<Character> listaTransicao = transicao.getCharacteres();
-                                            if(listaTransicao == null)
-                                                transicao.setCharacteres(lista);
+                                            int flagExiste = 0;
+                                            Transicao transicao = procuraTransicao(estadoSelecionado);
+
+                                            if(flagAFD == 1 && coletado.isEmpty()) //não posso permitir
+                                            {
+                                                Toast.makeText(getActivity(), "Transição Não Permitida", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else if(flagAFD == 1 && !transicaoValida(EstadoIniLig, coletado))
+                                            {
+                                                Toast.makeText(getActivity(), "Transição Não Permitida", Toast.LENGTH_SHORT).show();
+                                            }
                                             else
                                             {
-                                                //adiciono os characteres qua ainda não existem
-                                                //se já existir essa aresta, apenas adicionar mais elementos na lista de characteres
-                                                for(int iterator=0; iterator<lista.size(); iterator++)
+                                                if (transicao == null) //transição ainda não existia
                                                 {
-                                                    if(!listaTransicao.contains(lista.get(iterator)))
-                                                        listaTransicao.add(lista.get(iterator));
+                                                    transicao = new Transicao();
                                                 }
-                                                transicao.setCharacteres(listaTransicao); //devolvo a lista atualizada
-                                            }
+                                                else //transição já existia
+                                                    flagExiste = 1;
 
-                                            //fazer a ligação entre os estados EstadoIniLig e EstadoFimLig
-                                            EstadoFimLig = estadoSelecionado;
-                                            if(flagExiste == 0) //a transição não existia
-                                            {
-                                                transicao.setOrigem(EstadoIniLig); //= new Transicao(EstadoIniLig, EstadoFimLig, null);
-                                                transicao.setDestino(EstadoFimLig);
-                                                transicaoList.add(transicao);
-                                                transicaoView.addLista(transicao);
-                                            }
-                                            else
-                                                transicaoView.atualizarLig();
+                                                // aqui você já tem a string
+                                                //DESSA STRING, PEGAR CADA CARACTER E MANDAR PARA A LISTA DE CHARACTERES DA TRANSIÇÃO
+                                                List<Character> lista = characteresObtidos(coletado); //obter todos os caracteres diferentes da minha string
+                                                if(lista.isEmpty())
+                                                    lista.add('ε');
+                                                List<Character> listaTransicao = transicao.getCharacteres();
+                                                if(listaTransicao == null)
+                                                    transicao.setCharacteres(lista);
+                                                else
+                                                {
+                                                    //adiciono os characteres qua ainda não existem
+                                                    //se já existir essa aresta, apenas adicionar mais elementos na lista de characteres
+                                                    for(int iterator=0; iterator<lista.size(); iterator++)
+                                                    {
+                                                        if(!listaTransicao.contains(lista.get(iterator)))
+                                                            listaTransicao.add(lista.get(iterator));
+                                                    }
+                                                    transicao.setCharacteres(listaTransicao); //devolvo a lista atualizada
+                                                }
 
-                                            //Toast.makeText(v.getContext(), "Digitou: " + coletado, Toast.LENGTH_SHORT).show();
+                                                //fazer a ligação entre os estados EstadoIniLig e EstadoFimLig
+                                                EstadoFimLig = estadoSelecionado;
+                                                if(flagExiste == 0) //a transição não existia
+                                                {
+                                                    transicao.setOrigem(EstadoIniLig); //= new Transicao(EstadoIniLig, EstadoFimLig, null);
+                                                    transicao.setDestino(EstadoFimLig);
+                                                    transicaoList.add(transicao);
+                                                    transicaoView.addLista(transicao);
+                                                }
+                                                else
+                                                    transicaoView.atualizarLig();
+                                            }
                                         })
                                         .setNegativeButton("Cancel", null)
                                         .show();
@@ -1015,5 +1030,20 @@ public class AutomatoFinitoFragment extends Fragment {
     {
         Estado inicio = getEstadoInicial();
         return inicio != null && inicio.getInicio()==1 && inicio.getFim()==1;
+    }
+
+    private boolean transicaoValida(Estado estado, String coleta)
+    {
+        List<Transicao> transicoes = getTransicoes(estado);
+        List<Character> simbolos = characteresObtidos(coleta);
+        for(Transicao t : transicoes)
+        {
+            for(Character c : simbolos)
+            {
+                if(t.getCharacteres().contains(c))
+                    return false; //já existe a transição para esse símbolo
+            }
+        }
+        return true;
     }
 }

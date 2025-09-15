@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransicaoView extends View {
-    private List<Transicao> transicoes = new ArrayList<>();
+    public List<Transicao> transicoes = new ArrayList<>();
     private List<Integer> opostos;
     private static final float RAIO_ESTADO = 70f;
 
