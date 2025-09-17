@@ -47,15 +47,15 @@ public class MultipleRunDialogFragment extends DialogFragment {
         btnAdd.setText("+");
         btnAdd.setOnClickListener(v -> addNewInputField());
 
-        Button btnTest = new Button(getContext());
-        btnTest.setText("Test");
+        Button btnTest = view.findViewById(R.id.btnTest);
         btnTest.setOnClickListener(v -> runTests());
-
-        entriesContainer.addView(btnAdd);
-        entriesContainer.addView(btnTest);
 
         // Adiciona o primeiro campo de entrada
         addNewInputField();
+
+        entriesContainer.addView(btnAdd);
+
+
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Multiple Run")
