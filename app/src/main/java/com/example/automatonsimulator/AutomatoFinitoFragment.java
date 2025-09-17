@@ -38,7 +38,7 @@ import java.util.List;
  * Use the {@link AutomatoFinitoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AutomatoFinitoFragment extends Fragment {
+public class AutomatoFinitoFragment extends Fragment implements MultipleRunDialogFragment.MultipleRunListener {
     private float X, Y, offSetX = 0, offSetY =0;
     private int flagNew = 1, flagMove = 0, flagEdit = 0, flagDel = 0, flagLig = 0, flagLigIni = 0;
     private Button btNew, btMove, btEdit, btDel, btLig, btStepNext, btStepRun, btStepStop, btAFD;
@@ -90,6 +90,30 @@ public class AutomatoFinitoFragment extends Fragment {
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onTestRequested(List<String> inputs, List<EditText> inputFields) {
+        for (int i = 0; i < inputs.size(); i++) {
+            String texto = inputs.get(i);
+            EditText currentField = inputFields.get(i);
+
+            tvEntrada.setText(texto); // Atualiza o TextView para a lógica de teste funcionar
+            boolean accepted;
+
+            if (flagAFD == 1) { // determinístico
+                accepted = testaRapidoPalavraAFD();
+            } else { // não determinístico
+                accepted = testaRapidoPalavraAFND();
+            }
+
+            // Pinta o fundo do EditText lá no diálogo
+            if (accepted) {
+                currentField.setBackgroundColor(Color.parseColor("#008000")); // Verde
+            } else {
+                currentField.setBackgroundColor(Color.parseColor("#8B0000")); // Vermelho
+            }
+        }
     }
 
     @Override
@@ -151,7 +175,10 @@ public class AutomatoFinitoFragment extends Fragment {
         }
         else if(item.getItemId() == R.id.it_multipleRun)
         {
-            novaEntradaComAdd();
+            if(getEstadoInicial() != null && existeEstadoFinal())
+                novaEntradaComAdd();
+            else
+                Toast.makeText(getActivity(), "Not possible to test yet", Toast.LENGTH_SHORT).show();
         }
         else if (item.getItemId() == R.id.it_clear)
         {
@@ -823,79 +850,10 @@ public class AutomatoFinitoFragment extends Fragment {
     }
 
     private void novaEntradaComAdd() {
-        // ScrollView with LinearLayout vertical
-        ScrollView scrollView = new ScrollView(getContext());
-        LinearLayout layout = new LinearLayout(getContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 40, 40, 40);
-        scrollView.addView(layout);
-
-        // button "+"
-        Button btnAdd = new Button(getContext());
-        btnAdd.setText("+");
-        btnAdd.setAllCaps(false);
-
-        btnAdd.setOnClickListener(v -> {
-            LinearLayout item = new LinearLayout(getContext());
-            item.setOrientation(LinearLayout.HORIZONTAL);
-            item.setPadding(0, 20, 0, 20);
-
-            //text field
-            EditText input = new EditText(getContext());
-            input.setHint("Input");
-            input.setLayoutParams(new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            ));
-            item.addView(input);
-
-            layout.addView(item);
-        });
-
-        // "Test" button
-        Button btnTestar = new Button(getContext());
-        btnTestar.setText("Test");
-        btnTestar.setAllCaps(false);
-
-        btnTestar.setOnClickListener(v -> {
-            for (int i = 0; i < layout.getChildCount(); i++) {
-                View child = layout.getChildAt(i);
-                if (child instanceof LinearLayout) {
-                    LinearLayout linha = (LinearLayout) child;
-                    for (int j = 0; j < linha.getChildCount(); j++) {
-                        if (linha.getChildAt(j) instanceof EditText) {
-                            EditText et = (EditText) linha.getChildAt(j);
-                            String texto = et.getText().toString();
-                            tvEntrada.setText(texto);
-
-                            if (flagAFD == 1) { // determinístico
-                                if (testaRapidoPalavraAFD()) {
-                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#008000")); // verde
-                                } else {
-                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#8B0000")); // vermelho
-                                }
-                            } else { // não determinístico
-                                if (testaRapidoPalavraAFND()) {
-                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#008000")); //verde
-                                } else {
-                                    linha.getChildAt(0).setBackgroundColor(Color.parseColor("#8B0000")); //vermelho
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        //add buttons in layout
-        layout.addView(btnAdd);
-        layout.addView(btnTestar);
-
-        //build the AlertDialog
-        new AlertDialog.Builder(getContext())
-                .setTitle("Multiple Run")
-                .setView(scrollView)
-                .setPositiveButton("Close", null)
-                .show();
+        MultipleRunDialogFragment dialog = new MultipleRunDialogFragment();
+        // Define o fragmento atual como o "alvo" que receberá os resultados
+        dialog.setTargetFragment(this, 0);
+        dialog.show(getParentFragmentManager(), "MultipleRunDialog");
     }
 
     private void updateButtonElevation(Button activeButton)
