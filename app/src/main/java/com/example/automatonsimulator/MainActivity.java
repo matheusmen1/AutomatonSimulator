@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private ExpressaoRegularFragment expressaoRegularFragment = new ExpressaoRegularFragment();
     private AutomatoFinitoFragment automatoFinitoFragment = new AutomatoFinitoFragment();
     private integrantesFragment integrantesFragment = new integrantesFragment();
-
+    private GrammarFragment grammarFragment = new GrammarFragment();
+    private GrammarTransitionFragment grammarTransitionFragment = new GrammarTransitionFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
             }
             if(item.getItemId()==R.id.it_gramatica)
             {
-                Toast.makeText(this, "Comming Soon", Toast.LENGTH_SHORT).show();
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(frameLayout.getId(), grammarFragment);
+                fragmentTransaction.commit();
+                //Toast.makeText(this, "Comming Soon", Toast.LENGTH_SHORT).show();
             }
             if(item.getItemId()==R.id.it_dev)
             {
@@ -102,5 +107,11 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
+    }
+    public void trocarFragmentoTransition()
+    {
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(frameLayout.getId(), grammarTransitionFragment);
+        fragmentTransaction.commit();
     }
 }
