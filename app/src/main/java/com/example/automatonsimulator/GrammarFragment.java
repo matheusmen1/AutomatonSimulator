@@ -8,11 +8,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,11 +26,13 @@ import android.widget.EditText;
  */
 public class GrammarFragment extends Fragment {
     //atributos
-    EditText etVariaveis, etTerminais, etInicial;
-    Button btConfirmar;
-    MainActivity mainActivity;
-    FragmentTransaction fragmentTransaction;
-    FragmentManager fragmentManager;
+    private EditText etVariaveis, etTerminais, etInicial;
+    private Button btConfirmar;
+    private MainActivity mainActivity;
+    static public List<Character> variaveisList = new ArrayList<>();
+    static public List<Character> terminaisList = new ArrayList<>();
+    static public Character inicial;
+    private String variaveis, terminais;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -84,10 +91,59 @@ public class GrammarFragment extends Fragment {
 
         //função quando clicar no botão
         btConfirmar.setOnClickListener(v->{
-            mainActivity.trocarFragmentoTransition();
 
+            if (!etVariaveis.getText().toString().isEmpty() && !etTerminais.getText().toString().isEmpty() && !etInicial.getText().toString().isEmpty())
+            {
+                separarVariaveis();
+                separarTerminais();
+                inicial = etInicial.getText().toString().charAt(0);
+                mainActivity.trocarFragmentoTransition();
+                //exibirVariaveis();
+                //exibirTerminais();
+            }
+            else
+            {
+                Toast.makeText(view.getContext(), "Empty Field", Toast.LENGTH_SHORT).show();
+            }
         });
 
         return view;
+    }
+    private void separarVariaveis()
+    {
+        variaveisList.clear();
+        variaveis = etVariaveis.getText().toString();
+        variaveis = variaveis.replace(",", "");
+        variaveis = variaveis.replace(" ","");
+        int i = 0;
+        while(i < variaveis.length())
+        {
+            variaveisList.add(variaveis.charAt(i));
+            i++;
+        }
+    }
+    private void separarTerminais()
+    {
+        terminaisList.clear();
+        terminais = etTerminais.getText().toString();
+        terminais = terminais.replace(",", "");
+        terminais = terminais.replace(" ","");
+        int i = 0;
+        while(i < terminais.length())
+        {
+            terminaisList.add(terminais.charAt(i));
+            i++;
+        }
+    }
+    private void exibirTerminais()
+    {
+        for (int i = 0; i < terminaisList.size(); i++)
+            Log.d(String.valueOf(terminaisList.get(i)), "terminais");
+        Log.d(String.valueOf(inicial), "inicial");
+    }
+    private void exibirVariaveis()
+    {
+        for (int i = 0; i < variaveisList.size(); i++)
+            Log.d(String.valueOf(variaveisList.get(i)), "variaveis");
     }
 }

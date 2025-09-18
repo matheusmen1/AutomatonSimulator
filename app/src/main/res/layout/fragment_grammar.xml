@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2f2c79"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".GrammarFragment">
@@ -21,6 +22,18 @@
         android:text="Grammar Simulator"
         android:textColor="#9f90ea"
         android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="casual"
+        android:text="G = (V, T, P, S)"
+        android:textAlignment="center"
+        android:textColor="#F0F0F0"
+        android:textSize="24dp"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -48,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#F0F0F0"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*+|().ε"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ, "
             android:ems="10"
             android:fontFamily="casual"
             android:gravity="center"
@@ -86,7 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#F0F0F0"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*+|().ε"
+            android:digits="abcdefghijklmnopqrstuvwxyz, "
             android:ems="10"
             android:fontFamily="casual"
             android:gravity="center"
@@ -124,7 +137,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="#F0F0F0"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*+|().ε"
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             android:ems="10"
             android:fontFamily="casual"
             android:gravity="center"
@@ -139,8 +152,9 @@
 
     <Button
         android:id="@+id/btConfirmar"
-        android:layout_width="wrap_content"
+        android:layout_width="248dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="40dp"
         android:backgroundTint="#9f90ea"
         android:fontFamily="casual"
