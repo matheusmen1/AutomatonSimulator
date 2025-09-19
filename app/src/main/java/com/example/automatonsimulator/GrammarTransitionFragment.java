@@ -207,7 +207,7 @@ public class GrammarTransitionFragment extends Fragment {
                     {
                         if(!token.isEmpty()) //se não estiver vazia faço alguma coisa
                         {
-                            if(GrammarFragment.terminaisList.contains(token.charAt(0))) //se oq vai gerar esta no meu alfabeto
+                            if(GrammarFragment.terminaisList.contains(token.charAt(0)) || token.charAt(0) == 'e') //se oq vai gerar esta no meu alfabeto
                             {
                                 //terminais aqui é a mesma coisa que o alfabeto
                                 //se entrei aqui é porque a transição é válida
@@ -218,10 +218,25 @@ public class GrammarTransitionFragment extends Fragment {
                                      *  os characteres que chegarão aqui existem no meu alfabeto
                                      *  pois se isso for verdade, então eu tenho um estado final
                                      * */
-                                    if(!alfabetoAux.contains(token.charAt(0)))
+                                    if(token.charAt(0) == 'e')
                                     {
-                                        alfabetoAux.add(token.charAt(0)); //adiciono para testar no final
+                                        //então esse meu estado é um estado final
+                                        Estado e = null;
+                                        for(Estado estado : estados)
+                                        {
+                                            if(estado.getNum().equals(estadoAtual))
+                                                e = estado;
+                                        }
+                                        if(e != null)
+                                        {
+                                            //achei o respectivo estado
+                                            e.setFim(1);
+                                        }
                                     }
+//                                    if(!alfabetoAux.contains(token.charAt(0)))
+//                                    {
+//                                        alfabetoAux.add(token.charAt(0)); //adiciono para testar no final
+//                                    }
                                     //fazerTransicaoVolta(token, estadoAtual);
                                 }
                                 else //uma transicao de um estado para outro
@@ -255,21 +270,21 @@ public class GrammarTransitionFragment extends Fragment {
                             }
                         }
                     }
-                    if(contemTodoAlfabeto(alfabetoAux))
-                    {
-                        //então esse meu estado é um estado final
-                        Estado e = null;
-                        for(Estado estado : estados)
-                        {
-                            if(estado.getNum().equals(estadoAtual))
-                                e = estado;
-                        }
-                        if(e != null)
-                        {
-                            //achei o respectivo estado
-                            e.setFim(1);
-                        }
-                    }
+//                    if(contemTodoAlfabeto(alfabetoAux))
+//                    {
+//                        //então esse meu estado é um estado final
+//                        Estado e = null;
+//                        for(Estado estado : estados)
+//                        {
+//                            if(estado.getNum().equals(estadoAtual))
+//                                e = estado;
+//                        }
+//                        if(e != null)
+//                        {
+//                            //achei o respectivo estado
+//                            e.setFim(1);
+//                        }
+//                    }
                 }
                 else
                 {
