@@ -114,7 +114,7 @@ public class GrammarFragment extends Fragment {
         variaveisList.clear();
         variaveis = etVariaveis.getText().toString();
         variaveis = variaveis.replace(",", "");
-        variaveis = variaveis.replace(" ","");
+        variaveis = variaveis.replace(" ", "");
         int i = 0;
         while(i < variaveis.length())
         {
@@ -127,7 +127,7 @@ public class GrammarFragment extends Fragment {
         terminaisList.clear();
         terminais = etTerminais.getText().toString();
         terminais = terminais.replace(",", "");
-        terminais = terminais.replace(" ","");
+        terminais = terminais.replace(" ", "");
         int i = 0;
         while(i < terminais.length())
         {

@@ -14,6 +14,10 @@ public class Estado
         this.inicio = inicio;
     }
 
+    public Estado() {
+        this(0,0,"",0,0);
+    }
+
     public float getX() {
         return x;
     }
