@@ -207,7 +207,7 @@ public class GrammarTransitionFragment extends Fragment {
                     {
                         if(!token.isEmpty()) //se não estiver vazia faço alguma coisa
                         {
-                            if(GrammarFragment.terminaisList.contains(token.charAt(0)) || token.charAt(0) == 'e') //se oq vai gerar esta no meu alfabeto
+                            if(GrammarFragment.terminaisList.contains(token.charAt(0)) || token.charAt(0) == '#') //se oq vai gerar esta no meu alfabeto
                             {
                                 //terminais aqui é a mesma coisa que o alfabeto
                                 //se entrei aqui é porque a transição é válida
@@ -218,7 +218,7 @@ public class GrammarTransitionFragment extends Fragment {
                                      *  os characteres que chegarão aqui existem no meu alfabeto
                                      *  pois se isso for verdade, então eu tenho um estado final
                                      * */
-                                    if(token.charAt(0) == 'e')
+                                    if(token.charAt(0) == '#')
                                     {
                                         //então esse meu estado é um estado final
                                         Estado e = null;
@@ -233,11 +233,6 @@ public class GrammarTransitionFragment extends Fragment {
                                             e.setFim(1);
                                         }
                                     }
-//                                    if(!alfabetoAux.contains(token.charAt(0)))
-//                                    {
-//                                        alfabetoAux.add(token.charAt(0)); //adiciono para testar no final
-//                                    }
-                                    //fazerTransicaoVolta(token, estadoAtual);
                                 }
                                 else //uma transicao de um estado para outro
                                 {
@@ -270,21 +265,6 @@ public class GrammarTransitionFragment extends Fragment {
                             }
                         }
                     }
-//                    if(contemTodoAlfabeto(alfabetoAux))
-//                    {
-//                        //então esse meu estado é um estado final
-//                        Estado e = null;
-//                        for(Estado estado : estados)
-//                        {
-//                            if(estado.getNum().equals(estadoAtual))
-//                                e = estado;
-//                        }
-//                        if(e != null)
-//                        {
-//                            //achei o respectivo estado
-//                            e.setFim(1);
-//                        }
-//                    }
                 }
                 else
                 {
@@ -319,28 +299,12 @@ public class GrammarTransitionFragment extends Fragment {
         }
     }
 
-    private boolean contemTodoAlfabeto(List<Character> alfabeto)
-    {
-        alfabeto.sort(null);
-        GrammarFragment.terminaisList.sort(null);
-        if(!alfabeto.isEmpty())
-        {
-            for(int i=0; i<alfabeto.size() && i<GrammarFragment.terminaisList.size(); i++)
-            {
-                if(!alfabeto.get(i).equals(GrammarFragment.terminaisList.get(i)))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
     private boolean verificarTokens(List<String> tokens) {
         for (String token : tokens) {
             if (!token.isEmpty()) {
                 if (token.length() == 1) {
                     char c = token.charAt(0);
-                    if (!Character.isLowerCase(c)) {
+                    if (!Character.isLowerCase(c) && token.charAt(0) != '#') {
                         return false; // único char deve ser minúsculo
                     }
                 } else if (token.length() == 2) {
@@ -355,40 +319,6 @@ public class GrammarTransitionFragment extends Fragment {
             }
         }
         return true; // todos os tokens passaram
-    }
-
-    private void fazerTransicaoVolta(String token, String estadoAtual)
-    {
-        Transicao transicao = new Transicao();
-        Estado inicio = null, destino = null;
-        List<Character> characteres = new ArrayList<>();
-
-        //aqui eu tenho certeza de que o token tem tamanho 1
-        //procurar o meu estado na lista de estados
-        for(Estado estado : estados)
-        {
-            if(estado.getNum().equals(estadoAtual))
-                inicio = destino = estado;
-        }
-
-        //aqui eu preciso verificar se essa transição já existe
-        transicao.setOrigem(inicio);
-        transicao.setDestino(destino);
-        characteres.add(token.charAt(0));
-        transicao.setCharacteres(characteres);
-
-        Transicao teste = existeTransicao(transicao);
-        if(teste == null) //a transicao ainda não existe
-        {
-            transicoes.add(transicao);
-        }
-        else //a transicao já existe, apenas adicionar nela os characteres
-        {
-            if(!teste.getCharacteres().contains(token.charAt(0)))
-            {
-                teste.getCharacteres().add(token.charAt(0));
-            }
-        }
     }
 
     private void fazerTransicaoOutro(String token, String estadoAtual)
