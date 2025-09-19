@@ -156,6 +156,8 @@ public class GrammarTransitionFragment extends Fragment {
         boolean erro = false;
 
         //criação dos estados
+        this.estados.clear(); //limpar a lista de estados
+        this.transicoes.clear(); //limpar a lista de transicoes
         for(int i=0; i<linearLayout.getChildCount(); i++) //faço primeiro os meus estados
         {
             item = linearLayout.getChildAt(i);
@@ -182,6 +184,7 @@ public class GrammarTransitionFragment extends Fragment {
         {
             String estadoAtual;
             List<Character> alfabetoAux = new ArrayList<>();
+            alfabetoAux.clear();
 
             item = linearLayout.getChildAt(i);
             etTransicao = item.findViewById(R.id.etTransicao); //input que o usuário pode digitar
@@ -189,8 +192,7 @@ public class GrammarTransitionFragment extends Fragment {
 
             //limpar a lista e receber a informação digitada
             transicoes = etTransicao.getText().toString();
-            for (int j=0; j<tokens.size(); j++) //limpar a lista de tokens
-                tokens.remove(0);
+            tokens.clear();
             if(!transicoes.isEmpty())
             {
                 transicoes = transicoes.replaceAll(" ", ""); //tiro todos os espaços
@@ -199,7 +201,7 @@ public class GrammarTransitionFragment extends Fragment {
                 {
                     //se verdade então eu posso continuar o meu código
                     //fazer as ligações de cada estado
-                    alfabetoAux.clear();
+
                     estadoAtual = String.valueOf(tvVariavel.getText().toString().charAt(0)); //pego apenas o character da primeira posição
                     for(String token : tokens)
                     {
@@ -306,12 +308,16 @@ public class GrammarTransitionFragment extends Fragment {
     {
         alfabeto.sort(null);
         GrammarFragment.terminaisList.sort(null);
-        for(int i=0; i<alfabeto.size() && i<GrammarFragment.terminaisList.size(); i++)
+        if(!alfabeto.isEmpty())
         {
-            if(!alfabeto.get(i).equals(GrammarFragment.terminaisList.get(i)))
-                return false;
+            for(int i=0; i<alfabeto.size() && i<GrammarFragment.terminaisList.size(); i++)
+            {
+                if(!alfabeto.get(i).equals(GrammarFragment.terminaisList.get(i)))
+                    return false;
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean verificarTokens(List<String> tokens) {
